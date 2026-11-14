@@ -97,70 +97,73 @@ class _NavBarScreenState extends State<NavBarScreen> {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerDocked,
 
-            bottomNavigationBar: Container(
-              height: 60,
-              decoration: BoxDecoration(
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: BottomAppBar(
                 color: Theme.of(
                   context,
                 ).bottomNavigationBarTheme.backgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                elevation: 8,
+                shadowColor: ColorResources.getBlackAndWhite().withOpacity(0.18),
+                surfaceTintColor: Colors.transparent,
+                shape: AutomaticNotchedShape(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  const CircleBorder(),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: ColorResources.getBlackAndWhite().withOpacity(0.14),
-                    blurRadius: 80,
-                    offset: const Offset(0, 20),
+                notchMargin: 8,
+                padding: EdgeInsets.zero,
+                child: SizedBox(
+                  height: 60,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: BottomItemWidget(
+                          onTop: () => menuController.selectHomePage(),
+                          icon: menuController.currentTabIndex == 0
+                              ? Images.homeIconBold
+                              : Images.homeIcon,
+                          name: 'home'.tr,
+                          selectIndex: 0,
+                        ),
+                      ),
+                      Expanded(
+                        child: BottomItemWidget(
+                          onTop: () => menuController.selectHistoryPage(),
+                          icon: menuController.currentTabIndex == 1
+                              ? Images.clockIconBold
+                              : Images.clockIcon,
+                          name: 'history'.tr,
+                          selectIndex: 1,
+                        ),
+                      ),
+                      const SizedBox(width: 72),
+                      Expanded(
+                        child: BottomItemWidget(
+                          onTop: () => menuController.selectNotificationPage(),
+                          icon: menuController.currentTabIndex == 2
+                              ? Images.notificationIconBold
+                              : Images.notificationIcon,
+                          name: 'notification'.tr,
+                          selectIndex: 2,
+                        ),
+                      ),
+                      Expanded(
+                        child: BottomItemWidget(
+                          onTop: () => menuController.selectProfilePage(),
+                          icon: menuController.currentTabIndex == 3
+                              ? Images.profileIconBold
+                              : Images.profileIcon,
+                          name: 'profile'.tr,
+                          selectIndex: 3,
+                        ),
+                      ),
+                    ],
                   ),
-                  BoxShadow(
-                    color: ColorResources.getBlackAndWhite().withOpacity(0.20),
-                    blurRadius: 0.5,
-                    offset: const Offset(0, 0),
-                  ),
-                ],
-              ),
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  BottomItemWidget(
-                    onTop: () => menuController.selectHomePage(),
-                    icon: menuController.currentTabIndex == 0
-                        ? Images.homeIconBold
-                        : Images.homeIcon,
-                    name: 'home'.tr,
-                    selectIndex: 0,
-                  ),
-
-                  BottomItemWidget(
-                    onTop: () => menuController.selectHistoryPage(),
-                    icon: menuController.currentTabIndex == 1
-                        ? Images.clockIconBold
-                        : Images.clockIcon,
-                    name: 'history'.tr,
-                    selectIndex: 1,
-                  ),
-                  const SizedBox(height: 20, width: 20),
-
-                  BottomItemWidget(
-                    onTop: () => menuController.selectNotificationPage(),
-                    icon: menuController.currentTabIndex == 2
-                        ? Images.notificationIconBold
-                        : Images.notificationIcon,
-                    name: 'notification'.tr,
-                    selectIndex: 2,
-                  ),
-
-                  BottomItemWidget(
-                    onTop: () => menuController.selectProfilePage(),
-                    icon: menuController.currentTabIndex == 3
-                        ? Images.profileIconBold
-                        : Images.profileIcon,
-                    name: 'profile'.tr,
-                    selectIndex: 3,
-                  ),
-                ],
+                ),
               ),
             ),
           );

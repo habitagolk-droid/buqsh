@@ -22,6 +22,7 @@ class BottomItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTop,
+      borderRadius: BorderRadius.circular(12),
       child: GetBuilder<MenuItemController>(
         builder: (menuItemController) {
           final bool isSelected =
@@ -29,28 +30,39 @@ class BottomItemWidget extends StatelessWidget {
           final Color activeColor = Theme.of(context).primaryColor;
           final Color inactiveColor = ColorResources.nevDefaultColor;
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 24,
-                width: 24,
-                child: Image.asset(
-                  icon,
-                  fit: BoxFit.contain,
-                  color: isSelected ? activeColor : inactiveColor,
-                ),
+          return SizedBox(
+            width: double.infinity,
+            height: 60,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: Image.asset(
+                      icon,
+                      fit: BoxFit.contain,
+                      color: isSelected ? activeColor : inactiveColor,
+                    ),
+                  ),
+                  const SizedBox(height: 3.0),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: rubikSemiBold.copyWith(
+                        color: isSelected ? activeColor : inactiveColor,
+                        fontSize: Dimensions.fontSizeSmall,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 3.0),
-              Text(
-                name,
-                style: rubikSemiBold.copyWith(
-                  color: isSelected ? activeColor : inactiveColor,
-                  fontSize: Dimensions.fontSizeSmall,
-                ),
-              ),
-            ],
+            ),
           );
         },
       ),
