@@ -446,3 +446,42 @@ class _SendMoneyConfirmationBottomSheetState
     );
   }
 }
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: rubikRegular.copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: ColorResources.getGreyColor(),
+              ),
+            ),
+          ),
+          const SizedBox(width: Dimensions.paddingSizeSmall),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: rubikMedium.copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
