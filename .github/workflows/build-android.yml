@@ -72,6 +72,7 @@ jobs:
                  s/compileSdkVersion/compileSdk/g; \
                  s/compileSdk[[:space:]]+flutter\.compileSdkVersion/compileSdk 36/g; \
                  s/compileSdk[[:space:]]*=[[:space:]]*flutter\.compileSdkVersion/compileSdk = 36/g; \
+                 s/flutter\.compileSdk(Version)?/36/g; \
                  /^[[:space:]]*kotlinOptions\.jvmTarget[[:space:]]*=.*$/d" \
                 "$GRADLE_FILE"
               perl -0pi -e 's/\n[ \t]*kotlinOptions\s*\{.*?\n[ \t]*\}\s*/\n/gs' "$GRADLE_FILE"
