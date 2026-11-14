@@ -469,6 +469,7 @@
   "cashier_calculate_change": "احسب الباقي",
   "cashier_change_result": "الباقي المستحق",
   "execute_transaction": "تنفيذ",
+  "exchange_rate_label": "سعر الصرف",
   "welcome_cashier": "أهلاً بك،",
   "cashier_id": "معرف الكاشير",
   "active_session": "الجلسة نشطة",

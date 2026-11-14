@@ -466,6 +466,7 @@
   "cashier_calculate_change": "Calculate change",
   "cashier_change_result": "Change due",
   "execute_transaction": "Execute",
+  "exchange_rate_label": "Exchange rate",
   "welcome_cashier": "Welcome,",
   "cashier_id": "Cashier ID",
   "active_session": "Session Active",

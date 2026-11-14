@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:six_cash/common/widgets/custom_app_bar_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
@@ -118,8 +119,10 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
 
   /// تأكيد عملية التحويل / المصارفة
   Future<void> _confirmTransfer() async {
-    if (_fromWallet == null || _toWallet == null) return;
-    if (_fromWallet?.currencyCode == _toWallet?.currencyCode) {
+    final fromWallet = _fromWallet;
+    final toWallet = _toWallet;
+    if (fromWallet == null || toWallet == null) return;
+    if (fromWallet.currencyCode == toWallet.currencyCode) {
       showCustomSnackBarHelper('exchange_same_wallet_error'.tr, isError: true);
       return;
     }
@@ -131,7 +134,7 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
       return;
     }
 
-    final currentBalance = _fromWallet?.currentBalance ?? 0.0;
+    final currentBalance = fromWallet.currentBalance;
     if (amount > currentBalance) {
       showCustomSnackBarHelper('insufficient_balance'.tr, isError: true);
       return;
@@ -143,27 +146,42 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
       return;
     }
 
-    final fromCode = _fromWallet?.currencyCode ?? 'YER';
-    final toCode = _toWallet?.currencyCode ?? 'USD';
+    final fromCode = fromWallet.currencyCode;
+    final toCode = toWallet.currencyCode;
 
     setState(() => _isConfirming = true);
     try {
-      final response = await Get.find<WalletController>()
-          .transferBetweenWallets(
-            fromWalletId: _fromWallet?.id,
-            toWalletId: _toWallet?.id,
+      final response = await showModalBottomSheet<Response>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: false,
+        backgroundColor: Colors.transparent,
+        builder: (_) => _ExchangeConfirmationSheet(
+          fromWallet: fromWallet,
+          toWallet: toWallet,
+          amount: amount,
+          result: amount * rate,
+          rate: rate,
+          onExecute: () => Get.find<WalletController>().transferBetweenWallets(
+            fromWalletId: fromWallet.id,
+            toWalletId: toWallet.id,
             fromCurrency: fromCode,
             toCurrency: toCode,
             amount: amount,
             note: 'wallet_exchange',
-          );
+          ),
+        ),
+      );
+
+      if (!mounted || response == null) return;
       if (_isSuccessful(response.statusCode)) {
         final wallets = Get.find<WalletController>().wallets;
         final updatedFromWallet = wallets.where(
-          (wallet) => wallet.id == _fromWallet?.id,
+          (wallet) => wallet.id == fromWallet.id,
         );
         final updatedToWallet = wallets.where(
-          (wallet) => wallet.id == _toWallet?.id,
+          (wallet) => wallet.id == toWallet.id,
         );
 
         if (mounted) {
@@ -772,6 +790,254 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
 }
 
 /// صندوق اختيار المحفظة مع أيقونة العين لإخفاء/إظهار الرصيد
+class _ExchangeConfirmationSheet extends StatefulWidget {
+  final WalletModel fromWallet;
+  final WalletModel toWallet;
+  final double amount;
+  final double result;
+  final double rate;
+  final Future<Response> Function() onExecute;
+
+  const _ExchangeConfirmationSheet({
+    required this.fromWallet,
+    required this.toWallet,
+    required this.amount,
+    required this.result,
+    required this.rate,
+    required this.onExecute,
+  });
+
+  @override
+  State<_ExchangeConfirmationSheet> createState() =>
+      _ExchangeConfirmationSheetState();
+}
+
+class _ExchangeConfirmationSheetState
+    extends State<_ExchangeConfirmationSheet> {
+  bool _isExecuting = false;
+  String? _errorMessage;
+
+  Future<void> _execute() async {
+    if (_isExecuting) return;
+    setState(() {
+      _isExecuting = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await widget.onExecute();
+      if (!mounted) return;
+
+      final statusCode = response.statusCode;
+      if (statusCode != null && statusCode >= 200 && statusCode < 300) {
+        Navigator.of(context).pop(response);
+        return;
+      }
+
+      var message = 'exchange_failed'.tr;
+      if (response.body is Map && response.body['message'] != null) {
+        message = response.body['message'].toString();
+      } else if (response.statusText?.isNotEmpty == true) {
+        message = response.statusText!;
+      }
+      setState(() => _errorMessage = message);
+    } catch (_) {
+      if (mounted) setState(() => _errorMessage = 'exchange_failed'.tr);
+    } finally {
+      if (mounted) setState(() => _isExecuting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_isExecuting,
+      child: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(Dimensions.radiusSizeLarge),
+            ),
+          ),
+          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: ColorResources.getGreyColor().withOpacity(0.35),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: Dimensions.paddingSizeDefault),
+              Row(
+                children: [
+                  Icon(Icons.swap_horiz, color: ColorResources.primaryColor),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Expanded(
+                    child: Text(
+                      'transaction_details'.tr,
+                      style: rubikSemiBold.copyWith(
+                        fontSize: Dimensions.fontSizeLarge,
+                        color: ColorResources.primaryColor,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _isExecuting
+                        ? null
+                        : () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close),
+                    tooltip: 'close'.tr,
+                  ),
+                ],
+              ),
+              const Divider(height: Dimensions.paddingSizeLarge),
+              _ExchangeDetailRow(
+                label: 'transaction_type'.tr,
+                value: 'svc_exchange'.tr,
+              ),
+              _ExchangeDetailRow(
+                label: 'from_wallet'.tr,
+                value: '${widget.fromWallet.currencyCode} — ${widget.fromWallet.currencyName}',
+              ),
+              _ExchangeDetailRow(
+                label: 'to_wallet'.tr,
+                value: '${widget.toWallet.currencyCode} — ${widget.toWallet.currencyName}',
+              ),
+              _ExchangeDetailRow(
+                label: 'transfer_amount'.tr,
+                value: CurrencyFormatter.format(
+                  widget.amount,
+                  currency: widget.fromWallet.currencyCode,
+                ),
+                emphasize: true,
+              ),
+              _ExchangeDetailRow(
+                label: 'you_receive'.tr,
+                value: CurrencyFormatter.format(
+                  widget.result,
+                  currency: widget.toWallet.currencyCode,
+                ),
+                emphasize: true,
+              ),
+              _ExchangeDetailRow(
+                label: 'exchange_rate_label'.tr,
+                value:
+                    '1 ${widget.fromWallet.currencyCode} = ${widget.rate.toStringAsFixed(4)} ${widget.toWallet.currencyCode}',
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: Dimensions.paddingSizeSmall),
+                Text(
+                  _errorMessage!,
+                  style: rubikRegular.copyWith(
+                    color: ColorResources.errorColor,
+                    fontSize: Dimensions.fontSizeSmall,
+                  ),
+                ),
+              ],
+              const SizedBox(height: Dimensions.paddingSizeLarge),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isExecuting
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ColorResources.primaryColor,
+                        side: const BorderSide(
+                          color: ColorResources.primaryColor,
+                        ),
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                      child: Text('cancel'.tr),
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _isExecuting ? null : _execute,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorResources.primaryColor,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                      child: _isExecuting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text('execute_transaction'.tr),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExchangeDetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool emphasize;
+
+  const _ExchangeDetailRow({
+    required this.label,
+    required this.value,
+    this.emphasize = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: rubikRegular.copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: ColorResources.getGreyColor(),
+              ),
+            ),
+          ),
+          const SizedBox(width: Dimensions.paddingSizeSmall),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: (emphasize ? rubikSemiBold : rubikMedium).copyWith(
+                fontSize: Dimensions.fontSizeSmall,
+                color: emphasize
+                    ? ColorResources.primaryColor
+                    : Theme.of(context).textTheme.bodyLarge?.color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// صندوق اختيار المحفظة مع أيقونة العين لإخفاء/إظهار الرصيد
 class _WalletSelectBox extends StatelessWidget {
   final List<WalletModel> wallets;
   final WalletModel? selected;
@@ -941,6 +1207,8 @@ class _LiveRatesTable extends StatelessWidget {
         'sell': '1.00',
       },
     ];
+    final visibleRateItems =
+        rateItems.where((item) => item['code'] != 'YER').toList();
 
     return Container(
       width: double.infinity,
@@ -1004,10 +1272,10 @@ class _LiveRatesTable extends StatelessWidget {
           ),
 
           // صفوف الجدول
-          ...rateItems.asMap().entries.map((entry) {
+          ...visibleRateItems.asMap().entries.map((entry) {
             final idx = entry.key;
             final item = entry.value;
-            final isLast = idx == rateItems.length - 1;
+            final isLast = idx == visibleRateItems.length - 1;
 
             return Container(
               padding: const EdgeInsets.symmetric(

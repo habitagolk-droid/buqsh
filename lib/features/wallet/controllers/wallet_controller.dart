@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/exchange_rates_model.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/features/wallet/domain/reposotories/wallet_repo.dart';
@@ -199,6 +200,15 @@ class WalletController extends GetxController implements GetxService {
     required double amount,
     String? note,
   }) async {
+    final isAuthenticated = await Get.find<AuthController>()
+        .authenticateSensitiveOperation();
+    if (!isAuthenticated) {
+      return Response(
+        statusCode: 499,
+        statusText: 'transaction_authentication_cancelled'.tr,
+      );
+    }
+
     _isTransferring = true;
     update();
 
