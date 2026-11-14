@@ -302,7 +302,16 @@ class _BottomSheetWithSliderState extends State<BottomSheetWithSlider> {
                                 widget.contactModel, type: SuggestType.sendMoney,
                               )
                             ).then((value) {
-                              transactionId = value.body['transaction_id'];
+                              if (value.statusCode == 200 && value.body is Map) {
+                                transactionId =
+                                    value.body['transaction_id']?.toString();
+                              } else if (value.statusCode == 499) {
+                                showCustomSnackBarHelper(
+                                  value.statusText ??
+                                      'transaction_authentication_cancelled'.tr,
+                                  isError: true,
+                                );
+                              }
                             });
                           }else if(widget.transactionType == "request_money"){
                             transactionMoneyController.requestMoney(

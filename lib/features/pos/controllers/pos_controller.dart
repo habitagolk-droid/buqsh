@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
+import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/pos/models/pos_purchase_result.dart';
 import 'package:six_cash/features/pos/models/pos_terminal.dart';
 import 'package:six_cash/features/pos/services/pos_api_service.dart';
@@ -119,6 +120,7 @@ class PosController extends GetxController implements GetxService {
     String? terminalNumber,
     double? amount,
     String? currencyCode,
+    String? note,
   }) async {
     final suppliedQrToken = qrToken?.trim() ?? '';
     final token = suppliedQrToken.length >= 32 ? suppliedQrToken : '';
@@ -145,6 +147,14 @@ class PosController extends GetxController implements GetxService {
       return false;
     }
 
+    final isAuthenticated = await Get.find<AuthController>()
+        .authenticateSensitiveOperation();
+    if (!isAuthenticated) {
+      _errorMessage = 'transaction_authentication_cancelled'.tr;
+      update();
+      return false;
+    }
+
     // ولّد Idempotency-Key مرة واحدة واحتفظ به للعملية الحالية
     final idempotencyKey = _currentIdempotencyKey ?? const Uuid().v4();
     _currentIdempotencyKey = idempotencyKey;
@@ -160,6 +170,7 @@ class PosController extends GetxController implements GetxService {
         terminalNumber: terminalNum.isNotEmpty ? terminalNum : null,
         amount: amount,
         currencyCode: currencyCode,
+        note: note,
       );
       if (!_isSuccessful(response.statusCode)) {
         debugPrint('POS purchase failed [${response.statusCode}]');

@@ -18,8 +18,13 @@ import 'package:six_cash/utils/tafqeet_helper.dart';
 
 class PosPaymentScreen extends StatefulWidget {
   final String? initialTerminalNumber;
+  final bool showFavoritesOnOpen;
 
-  const PosPaymentScreen({Key? key, this.initialTerminalNumber})
+  const PosPaymentScreen({
+    Key? key,
+    this.initialTerminalNumber,
+    this.showFavoritesOnOpen = false,
+  })
     : super(key: key);
 
   @override
@@ -29,6 +34,7 @@ class PosPaymentScreen extends StatefulWidget {
 class _PosPaymentScreenState extends State<PosPaymentScreen> {
   final TextEditingController _terminalController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   // 1: عبر بقش (نشط)، 2: عبر محافظ أخرى
   int _selectedTab = 0;
@@ -69,6 +75,11 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final posCtrl = Get.find<PosController>();
         posCtrl.lookupTerminal(_terminalController.text.trim());
+      });
+    }
+    if (widget.showFavoritesOnOpen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showFavoriteTerminals();
       });
     }
   }
@@ -112,6 +123,7 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
   void dispose() {
     _terminalController.dispose();
     _amountController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -274,6 +286,7 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
         terminal: terminal,
         amount: amount,
         currencyCode: currency,
+        note: _notesController.text.trim(),
       ),
     );
 
@@ -283,6 +296,7 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
       terminalNumber: terminal.terminalNumber,
       amount: amount,
       currencyCode: currency,
+      note: _notesController.text.trim(),
     );
 
     if (success && posCtrl.lastResult != null) {
@@ -1021,6 +1035,56 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
                         ),
                       ],
 
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
+                      Text(
+                        'notes'.tr,
+                        style: rubikMedium.copyWith(
+                          fontSize: Dimensions.fontSizeDefault,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                      TextField(
+                        controller: _notesController,
+                        minLines: 2,
+                        maxLines: 3,
+                        textInputAction: TextInputAction.newline,
+                        decoration: InputDecoration(
+                          hintText: 'notes'.tr,
+                          filled: true,
+                          fillColor: Theme.of(context).cardColor,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.paddingSizeDefault,
+                            vertical: Dimensions.paddingSizeSmall,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.radiusSizeDefault,
+                            ),
+                            borderSide: BorderSide(
+                              color: ColorResources.getGreyColor().withOpacity(0.3),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.radiusSizeDefault,
+                            ),
+                            borderSide: BorderSide(
+                              color: ColorResources.getGreyColor().withOpacity(0.3),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.radiusSizeDefault,
+                            ),
+                            borderSide: const BorderSide(
+                              color: ColorResources.primaryColor,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
                       // ==========================================
@@ -1052,7 +1116,7 @@ class _PosPaymentScreenState extends State<PosPaymentScreen> {
                                   ),
                                 )
                               : Text(
-                                  'pay_now'.tr,
+                                  'continue_button'.tr,
                                   style: rubikSemiBold.copyWith(
                                     color: Colors.white,
                                     fontSize: Dimensions.fontSizeDefault,
@@ -1078,11 +1142,13 @@ class _PosPaymentConfirmationSheet extends StatelessWidget {
   final PosTerminal terminal;
   final double amount;
   final String currencyCode;
+  final String? note;
 
   const _PosPaymentConfirmationSheet({
     required this.terminal,
     required this.amount,
     required this.currencyCode,
+    this.note,
   });
 
   @override
@@ -1095,7 +1161,7 @@ class _PosPaymentConfirmationSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'confirm_pos_payment'.tr,
+              'transaction_details'.tr,
               style: rubikSemiBold.copyWith(fontSize: Dimensions.fontSizeLarge),
             ),
             const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -1122,11 +1188,15 @@ class _PosPaymentConfirmationSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _DialogRow(label: 'from_wallet'.tr, value: currencyCode),
+            if (note?.isNotEmpty == true) ...[
+              const SizedBox(height: 8),
+              _DialogRow(label: 'notes'.tr, value: note!),
+            ],
             const SizedBox(height: Dimensions.paddingSizeLarge),
             Row(
               children: [
                 Expanded(
-                  child: TextButton(
+                  child: OutlinedButton(
                     onPressed: () => Navigator.pop(context, false),
                     child: Text('cancel'.tr),
                   ),
@@ -1139,7 +1209,7 @@ class _PosPaymentConfirmationSheet extends StatelessWidget {
                     ),
                     onPressed: () => Navigator.pop(context, true),
                     child: Text(
-                      'confirm'.tr,
+                      'execute_transaction'.tr,
                       style: rubikMedium.copyWith(color: Colors.white),
                     ),
                   ),

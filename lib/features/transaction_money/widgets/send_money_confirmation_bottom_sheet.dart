@@ -20,6 +20,7 @@ class SendMoneyConfirmationBottomSheet extends StatefulWidget {
   final String recipientName;
   final String? recipientAvatar;
   final double amount;
+  final String? note;
   final String? purpose;
 
   const SendMoneyConfirmationBottomSheet({
@@ -29,6 +30,7 @@ class SendMoneyConfirmationBottomSheet extends StatefulWidget {
     required this.recipientName,
     this.recipientAvatar,
     required this.amount,
+    this.note,
     this.purpose,
   }) : super(key: key);
 
@@ -66,6 +68,7 @@ class _SendMoneyConfirmationBottomSheetState
         contactModel: contact,
         amount: widget.amount,
         purpose: widget.purpose ?? 'Transfer',
+        note: widget.note,
         pinCode: _pin,
         currencyCode: widget.wallet.currencyCode,
         idempotencyKey: idempotencyKey,
@@ -89,6 +92,12 @@ class _SendMoneyConfirmationBottomSheetState
 
         // الرجوع للرئيسية
         Get.offAllNamed(RouteHelper.getNavBarRoute());
+      } else if (response.statusCode == 499) {
+        showCustomSnackBarHelper(
+          response.statusText ?? 'transaction_authentication_cancelled'.tr,
+          isError: true,
+        );
+        if (mounted) Navigator.of(context).pop(false);
       } else {
         String message = 'error'.tr;
         final body = response.body;
@@ -138,7 +147,7 @@ class _SendMoneyConfirmationBottomSheetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'confirm_transfer'.tr,
+                  'transaction_details'.tr,
                   style: rubikSemiBold.copyWith(
                     fontSize: Dimensions.fontSizeLarge,
                     color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -300,6 +309,11 @@ class _SendMoneyConfirmationBottomSheetState
             ),
 
             const SizedBox(height: Dimensions.paddingSizeDefault),
+
+            if (widget.note?.isNotEmpty == true) ...[
+              _DetailRow(label: 'notes'.tr, value: widget.note!),
+              const SizedBox(height: Dimensions.paddingSizeDefault),
+            ],
 
             // --- 3. تحذير بلون errorColor ---
             Container(

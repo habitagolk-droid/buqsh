@@ -98,6 +98,35 @@ class AuthController extends GetxController implements GetxService {
     }
   }
 
+  /// Requires device authentication before any sensitive money movement.
+  /// biometricOnly=false allows the operating system to offer its device PIN
+  /// or passcode when biometric authentication is unavailable.
+  Future<bool> authenticateSensitiveOperation() async {
+    if (_isAuthenticating) return false;
+
+    _isAuthenticating = true;
+    try {
+      final LocalAuthentication bioAuth = LocalAuthentication();
+      final isSupported = await bioAuth.isDeviceSupported();
+      final canCheckBiometrics = await bioAuth.canCheckBiometrics;
+      if (!isSupported && !canCheckBiometrics) return false;
+
+      return await bioAuth.authenticate(
+        localizedReason: 'authenticate_to_confirm_transaction'.tr,
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false,
+          useErrorDialogs: true,
+        ),
+      );
+    } catch (e) {
+      debugPrint('Sensitive-operation authentication failed: $e');
+      return false;
+    } finally {
+      _isAuthenticating = false;
+    }
+  }
+
   Future<void> authenticateWithBiometric(
     bool autoLogin,
     String? pin, {

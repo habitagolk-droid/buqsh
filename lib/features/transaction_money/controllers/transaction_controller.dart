@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:six_cash/common/models/contact_model.dart';
 import 'package:six_cash/data/api/api_checker.dart';
+import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/auth/domain/reposotories/auth_repo.dart';
 import 'package:six_cash/features/setting/controllers/profile_screen_controller.dart';
 import 'package:six_cash/features/transaction_money/domain/models/contact_tag_model.dart';
@@ -165,9 +166,19 @@ class TransactionMoneyController extends GetxController implements GetxService {
     String? purpose,
     String? pinCode,
     String? currencyCode,
+    String? note,
     String? idempotencyKey,
     required Function onSuggest,
   }) async {
+    final isAuthenticated = await Get.find<AuthController>()
+        .authenticateSensitiveOperation();
+    if (!isAuthenticated) {
+      return Response(
+        statusCode: 499,
+        statusText: 'transaction_authentication_cancelled'.tr,
+      );
+    }
+
     _isLoading = true;
     _isNextBottomSheet = false;
     update();
@@ -177,6 +188,7 @@ class TransactionMoneyController extends GetxController implements GetxService {
       purpose: purpose,
       pin: pinCode,
       currencyCode: currencyCode,
+      note: note,
       idempotencyKey: idempotencyKey,
     );
     if(response.statusCode == 200){

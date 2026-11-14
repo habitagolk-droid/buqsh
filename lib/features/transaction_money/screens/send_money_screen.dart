@@ -33,6 +33,7 @@ class SendMoneyScreen extends StatefulWidget {
 class _SendMoneyScreenState extends State<SendMoneyScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
   final String _countryCode = '+967'; // اليمن افتراضياً
 
   WalletModel? _selectedWallet;
@@ -104,6 +105,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
   void dispose() {
     _phoneController.dispose();
     _amountController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -240,6 +242,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
         recipientName: resolvedName,
         recipientAvatar: _recipientAvatar,
         amount: amount,
+        note: _notesController.text.trim(),
       ),
     );
   }
@@ -659,10 +662,60 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                   ),
                 ],
 
+                const SizedBox(height: Dimensions.paddingSizeLarge),
+                Text(
+                  'notes'.tr,
+                  style: rubikMedium.copyWith(
+                    fontSize: Dimensions.fontSizeDefault,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
+                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                TextField(
+                  controller: _notesController,
+                  minLines: 2,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.newline,
+                  decoration: InputDecoration(
+                    hintText: 'notes'.tr,
+                    filled: true,
+                    fillColor: Theme.of(context).cardColor,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.paddingSizeDefault,
+                      vertical: Dimensions.paddingSizeSmall,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.radiusSizeDefault,
+                      ),
+                      borderSide: BorderSide(
+                        color: ColorResources.getGreyColor().withOpacity(0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.radiusSizeDefault,
+                      ),
+                      borderSide: BorderSide(
+                        color: ColorResources.getGreyColor().withOpacity(0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.radiusSizeDefault,
+                      ),
+                      borderSide: const BorderSide(
+                        color: ColorResources.primaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
                 // ==========================================
-                // 4. زر استمرار أخضر (ColorResources.primaryColor)
+                // 5. زر استمرار أخضر (ColorResources.primaryColor)
                 // ==========================================
                 SizedBox(
                   width: double.infinity,

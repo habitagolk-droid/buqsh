@@ -22,6 +22,7 @@ class PosApiService {
     String? terminalNumber,
     double? amount,
     String? currencyCode,
+    String? note,
   }) async {
     final Map<String, dynamic> body = {};
     if (qrToken != null && qrToken.isNotEmpty) {
@@ -37,6 +38,9 @@ class PosApiService {
       body['currency'] = currencyCode;
       body['currency_code'] = currencyCode;
       body['wallet_currency'] = currencyCode;
+    }
+    if (note != null && note.trim().isNotEmpty) {
+      body['note'] = note.trim();
     }
 
     final Map<String, String> headers = {'Idempotency-Key': idempotencyKey};

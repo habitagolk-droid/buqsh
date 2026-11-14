@@ -4,6 +4,7 @@ import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
 import 'package:six_cash/features/pos/screens/cashier_wallets_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_pos_sale_screen.dart';
+import 'package:six_cash/features/pos/screens/pos_payment_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/color_resources.dart';
@@ -499,35 +500,49 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
   }
 
   Widget _buildQuickActionsGrid() {
-    return Row(
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      childAspectRatio: 1.25,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       children: [
-        Expanded(
-          child: _buildActionTile(
-            title: 'محفظة الكاشير',
-            subtitle: 'عرض الأرصدة والعهد',
-            icon: Icons.account_balance_wallet_rounded,
-            color: const Color(0xFF1B5E20),
-            onTap: () => setState(() => _currentIndex = 1),
-          ),
+        _buildActionTile(
+          title: 'cashier_return_purchases'.tr,
+          subtitle: 'cashier_refund_short'.tr,
+          icon: Icons.assignment_return_rounded,
+          color: kPrimaryColor,
+          onTap: _showRefundUnavailableDialog,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildActionTile(
-            title: 'سجل العمليات',
-            subtitle: 'المبيعات السابقة',
-            icon: Icons.receipt_long_rounded,
-            color: const Color(0xFF00695C),
-            onTap: () => setState(() => _currentIndex = 2),
-          ),
+        _buildActionTile(
+          title: 'cashier_change_calculator'.tr,
+          subtitle: 'cashier_change_title'.tr,
+          icon: Icons.calculate_rounded,
+          color: const Color(0xFF00695C),
+          onTap: _showChangeCalculator,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildActionTile(
-            title: 'إدارة الوردية',
-            subtitle: 'فتح أو إغلاق الوردية',
-            icon: Icons.access_time_filled_rounded,
-            color: const Color(0xFFE65100),
-            onTap: _onShiftManagementTap,
+        _buildActionTile(
+          title: 'cashier_topup_payment'.tr,
+          subtitle: 'svc_pos'.tr,
+          icon: Icons.payment_rounded,
+          color: const Color(0xFF1B5E20),
+          onTap: () => Get.toNamed(RouteHelper.posPayment),
+        ),
+        _buildActionTile(
+          title: 'cashier_reports'.tr,
+          subtitle: 'سجل المبيعات والعمليات',
+          icon: Icons.bar_chart_rounded,
+          color: const Color(0xFF00695C),
+          onTap: () => setState(() => _currentIndex = 2),
+        ),
+        _buildActionTile(
+          title: 'cashier_favorites'.tr,
+          subtitle: 'favorite_terminals'.tr,
+          icon: Icons.favorite_rounded,
+          color: const Color(0xFF1B5E20),
+          onTap: () => Get.to(
+            () => const PosPaymentScreen(showFavoritesOnOpen: true),
           ),
         ),
       ],
@@ -600,6 +615,83 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
     } else {
       _confirmCloseShift(controller);
     }
+  }
+
+  void _showRefundUnavailableDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('cashier_return_purchases'.tr, style: rubikBold),
+        content: Text('cashier_refund_unavailable'.tr, style: rubikRegular),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text('close'.tr),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showChangeCalculator() async {
+    final totalController = TextEditingController();
+    final receivedController = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('cashier_change_title'.tr, style: rubikBold),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: totalController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'cashier_total_amount'.tr),
+            ),
+            TextField(
+              controller: receivedController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'cashier_paid_amount'.tr),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text('cancel'.tr),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+            onPressed: () {
+              final total = double.tryParse(totalController.text.trim());
+              final received = double.tryParse(receivedController.text.trim());
+              if (total == null || received == null || total < 0 || received < total) {
+                showCustomSnackBarHelper(
+                  'cashier_invalid_change_amount'.tr,
+                  isError: true,
+                );
+                return;
+              }
+              Navigator.of(dialogContext).pop();
+              showCustomSnackBarHelper(
+                '${'cashier_change_result'.tr}: ${CurrencyFormatter.format(received - total, currency: 'YER')}',
+                isError: false,
+              );
+            },
+            child: Text(
+              'cashier_calculate_change'.tr,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    totalController.dispose();
+    receivedController.dispose();
   }
 
   Widget _buildStartSaleBigButton() {

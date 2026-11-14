@@ -21,6 +21,7 @@ class TransactionRepo {
     required String? purpose,
     required String? pin,
     String? currencyCode,
+    String? note,
     String? idempotencyKey,
   }) async {
     final Map<String, dynamic> body = {
@@ -33,6 +34,9 @@ class TransactionRepo {
       body['currency'] = currencyCode;
       body['currency_code'] = currencyCode;
       body['wallet_currency'] = currencyCode;
+    }
+    if (note != null && note.trim().isNotEmpty) {
+      body['note'] = note.trim();
     }
     final Map<String, String> headers = {};
     if (idempotencyKey != null && idempotencyKey.isNotEmpty) {
