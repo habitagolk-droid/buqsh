@@ -21,6 +21,7 @@ import 'package:six_cash/features/auth/domain/reposotories/auth_repo.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/app_constants.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
+import 'package:six_cash/services/fcm_service.dart';
 import 'package:six_cash/services/token_storage.dart';
 
 class AuthController extends GetxController implements GetxService {
@@ -413,6 +414,13 @@ class AuthController extends GetxController implements GetxService {
           : null;
       final isMerchant = user is Map && user['is_merchant'] == true;
       final role = isMerchant ? UserRole.merchant : UserRole.customer;
+
+      // Detach any previous account from this device before assigning its token.
+      await FcmService.clearForRole(
+        role,
+        authToken: await TokenStorage.getAuthToken(role),
+      );
+      await FcmService.clearOtherRoles(role);
 
       // حفظ التوكن في SharedPreferences و ApiClient
       await authRepo.saveUserToken(token);

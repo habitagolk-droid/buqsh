@@ -23,6 +23,7 @@ class AppConstants {
   static const String cashierCurrentShiftUri = '/api/v1/cashier/shifts/current';
   static const String cashierOpenShiftUri = '/api/v1/cashier/shifts/open';
   static const String cashierCloseShiftUri = '/api/v1/cashier/shifts/close';
+  static const String cashierRefundUri = '/api/v1/cashier/refunds';
   static const String customerLogoutUri = '/api/v1/customer/logout';
   static const String customerForgetPassOtpUri =
       '/api/v1/customer/auth/forgot-password';

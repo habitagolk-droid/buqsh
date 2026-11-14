@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -92,9 +91,34 @@ class CashierAuthRepo {
     }, sensitive: true);
   }
 
+  Future<Response> submitRefund({
+    required String receiptNumber,
+    required double amount,
+    required String reason,
+  }) async {
+    final token = await getToken();
+    final authorization = (token ?? '').startsWith('Bearer ')
+        ? token!
+        : 'Bearer ${token ?? ''}';
+    return apiClient.postData(
+      AppConstants.cashierRefundUri,
+      {
+        'receipt_number': receiptNumber,
+        'amount': amount,
+        'reason': reason,
+      },
+      headers: {'Authorization': authorization},
+      sensitive: true,
+    );
+  }
+
   /// يمسح جلسة العميل السابقة بالكامل من الذاكرة و ApiClient و SharedPreferences و SecureStorage
   Future<void> clearCustomerSession() async {
     try {
+      await FcmService.clearForRole(
+        UserRole.customer,
+        authToken: await TokenStorage.getAuthToken(UserRole.customer),
+      );
       // 1. مسح توكن العميل من TokenStorage
       await TokenStorage.clearRole(UserRole.customer);
 
@@ -152,17 +176,6 @@ class CashierAuthRepo {
   Future<bool> updateFcmToken(String authToken) async {
     try {
       await TokenStorage.saveAuthToken(UserRole.cashier, authToken);
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      if (fcmToken != null && fcmToken.isNotEmpty) {
-        final authorization = authToken.startsWith('Bearer ')
-            ? authToken
-            : 'Bearer $authToken';
-        await apiClient.putData(
-          AppConstants.cashierFcmUri,
-          {'fcm_token': fcmToken},
-          headers: {'Authorization': authorization},
-        );
-      }
       return await FcmService.syncForRole(UserRole.cashier);
     } catch (e) {
       debugPrint('Error updating cashier FCM token: $e');
@@ -207,6 +220,10 @@ class CashierAuthRepo {
   }
 
   Future<void> removeToken() async {
+    await FcmService.clearForRole(
+      UserRole.cashier,
+      authToken: await getToken() ?? await TokenStorage.getAuthToken(UserRole.cashier),
+    );
     await TokenStorage.clearRole(UserRole.cashier);
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString(AppConstants.activeRoleKey) == UserRole.cashier.name) {

@@ -7,6 +7,7 @@ import 'package:six_cash/features/pos/auth/cashier_login_response.dart';
 import 'package:six_cash/features/pos/auth/cashier_session_info.dart';
 import 'package:six_cash/features/pos/screens/cashier_home_screen.dart';
 import 'package:six_cash/helper/route_helper.dart';
+import 'package:six_cash/services/fcm_service.dart';
 
 class CashierAuthController extends GetxController {
   final CashierAuthRepo authRepo;
@@ -81,6 +82,7 @@ class CashierAuthController extends GetxController {
         return false;
       }
 
+      await FcmService.clearOtherRoles(UserRole.cashier);
       await authRepo.saveToken(credentials.token);
 
       // ⭐ حفظ الدور النشط + مزامنة FCM للكاشير بعد login ناجح

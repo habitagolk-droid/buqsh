@@ -84,7 +84,17 @@ class AuthRepo extends GetxService{
 
 
    Future<Response> logout() async {
-     return await apiClient.postData(AppConstants.customerLogoutUri,{});
+     final storedRole = sharedPreferences.getString(AppConstants.activeRoleKey);
+     final role = storedRole == UserRole.merchant.name
+         ? UserRole.merchant
+         : UserRole.customer;
+     await FcmService.clearForRole(role, authToken: await TokenStorage.getAuthToken(role));
+     final response = await apiClient.postData(AppConstants.customerLogoutUri,{});
+     if (response.statusCode == 200) {
+       await TokenStorage.clearRole(role);
+       await sharedPreferences.remove(AppConstants.activeRoleKey);
+     }
+     return response;
    }
    Future<Response> updateProfile(Map<String,String> profileInfo, List<MultipartBody> multipartBody) async {
      return await apiClient.postMultipartData(AppConstants.customerUpdateProfile, profileInfo, multipartBody);

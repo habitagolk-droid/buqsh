@@ -120,7 +120,7 @@ class CashierWalletsScreen extends StatelessWidget {
                   if (cashierWallets.isEmpty)
                     _buildEmptyState('لا توجد محافظ كاشير مسجلة حالياً')
                   else
-                    ...cashierWallets.map((w) => _buildWalletCard(w, isCashier: true)),
+                    _buildWalletCardsRow(cashierWallets, isCashier: true),
 
                   const SizedBox(height: 28),
 
@@ -137,7 +137,7 @@ class CashierWalletsScreen extends StatelessWidget {
                   if (merchantWallets.isEmpty)
                     _buildEmptyState('لا توجد محافظ متجر مسجلة حالياً')
                   else
-                    ...merchantWallets.map((w) => _buildWalletCard(w, isCashier: false)),
+                    _buildWalletCardsRow(merchantWallets, isCashier: false),
 
                   const SizedBox(height: 30),
                 ],
@@ -227,121 +227,68 @@ class CashierWalletsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWalletCard(WalletModel wallet, {required bool isCashier}) {
-    final currencyColor = _getCurrencyColor(wallet.currencyCode);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isCashier ? kPrimaryColor.withValues(alpha: 0.2) : Colors.grey.shade200,
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: currencyColor.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // أيقونة العملة
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [currencyColor, currencyColor.withValues(alpha: 0.8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Center(
-              child: Text(
-                wallet.currencySymbol,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+  Widget _buildWalletCardsRow(List<WalletModel> wallets, {required bool isCashier}) {
+    return SizedBox(
+      height: 180,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: wallets.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 16),
+        itemBuilder: (context, index) {
+          final wallet = wallets[index];
+          final color = _getCurrencyColor(wallet.currencyCode);
+          return SizedBox(
+            width: 250,
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [color, color.withValues(alpha: 0.82)],
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.18),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ),
-          ),
-          const SizedBox(width: 14),
-
-          // تفاصيل العملة والرصيد
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      wallet.currencyName,
-                      style: rubikBold.copyWith(
-                        fontSize: Dimensions.fontSizeDefault,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: currencyColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
                         wallet.currencyCode,
-                        style: rubikBold.copyWith(
-                          fontSize: 11,
-                          color: currencyColor,
-                        ),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
                       ),
+                      const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
+                    ],
+                  ),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      CurrencyFormatter.format(wallet.currentBalance, currency: wallet.currencyCode),
+                      style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      CurrencyFormatter.format(
-                        wallet.currentBalance,
-                        currency: wallet.currencyCode,
-                      ),
-                      style: rubikBold.copyWith(
-                        fontSize: 18,
-                        color: currencyColor,
-                      ),
-                    ),
-                    if (isCashier)
-                      Text(
-                        'رصيد الصندوق',
-                        style: rubikRegular.copyWith(
-                          fontSize: 11,
-                          color: Colors.grey[500],
-                        ),
-                      )
-                    else
-                      Text(
-                        'رصيد المتجر',
-                        style: rubikRegular.copyWith(
-                          fontSize: 11,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                  ],
-                ),
-              ],
+                  ),
+                  Text(
+                    isCashier ? 'رصيد الصندوق • ${wallet.currencyName}' : 'رصيد المتجر • ${wallet.currencyName}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

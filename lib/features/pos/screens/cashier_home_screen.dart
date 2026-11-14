@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:get/get.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
@@ -22,6 +23,7 @@ class CashierHomeScreen extends StatefulWidget {
 
 class _CashierHomeScreenState extends State<CashierHomeScreen> {
   int _currentIndex = 0;
+  int _currentNavIndex = 0;
 
   static const Color kPrimaryColor = Color(0xFF004D40);
   static const Color kLimeColor = Color(0xFFD4E157);
@@ -47,13 +49,21 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
   }
 
   void _onTabSelect(int index) {
-    if (index == 4) {
-      _confirmLogout(context);
-      return;
+    setState(() => _currentNavIndex = index);
+    switch (index) {
+      case 0:
+        setState(() => _currentIndex = 0);
+        break;
+      case 1:
+        Get.toNamed(RouteHelper.notification);
+        break;
+      case 2:
+        Get.toNamed(RouteHelper.history);
+        break;
+      case 3:
+        Get.toNamed(RouteHelper.profile);
+        break;
     }
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
@@ -501,10 +511,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
 
   Widget _buildQuickActionsGrid() {
     return GridView.count(
-      crossAxisCount: 2,
+      crossAxisCount: 3,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.25,
+      childAspectRatio: 1.0,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -513,7 +523,7 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           subtitle: 'cashier_refund_short'.tr,
           icon: Icons.assignment_return_rounded,
           color: kPrimaryColor,
-          onTap: _showRefundUnavailableDialog,
+          onTap: _showRefundDialog,
         ),
         _buildActionTile(
           title: 'cashier_change_calculator'.tr,
@@ -566,9 +576,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: const Color(0x0F003840),
+              blurRadius: 6,
+              spreadRadius: 0.5,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -617,46 +628,40 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
     }
   }
 
-  void _showRefundUnavailableDialog() {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('cashier_return_purchases'.tr, style: rubikBold),
-        content: Text('cashier_refund_unavailable'.tr, style: rubikRegular),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('close'.tr),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showChangeCalculator() async {
-    final totalController = TextEditingController();
-    final receivedController = TextEditingController();
-
+  Future<void> _showRefundDialog() async {
+    final receiptController = TextEditingController();
+    final amountController = TextEditingController();
+    final reasonController = TextEditingController();
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('cashier_change_title'.tr, style: rubikBold),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: totalController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(labelText: 'cashier_total_amount'.tr),
-            ),
-            TextField(
-              controller: receivedController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(labelText: 'cashier_paid_amount'.tr),
-            ),
-          ],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text('cashier_return_purchases'.tr, style: rubikBold),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: receiptController,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: 'receipt_number'.tr,
+                  prefixIcon: const Icon(Icons.receipt_long_rounded),
+                ),
+              ),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(labelText: 'cashier_refund_amount'.tr),
+              ),
+              TextField(
+                controller: reasonController,
+                maxLines: 2,
+                decoration: InputDecoration(labelText: 'cashier_refund_reason'.tr),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -666,32 +671,206 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
             onPressed: () {
-              final total = double.tryParse(totalController.text.trim());
-              final received = double.tryParse(receivedController.text.trim());
-              if (total == null || received == null || total < 0 || received < total) {
-                showCustomSnackBarHelper(
-                  'cashier_invalid_change_amount'.tr,
-                  isError: true,
-                );
+              final receipt = receiptController.text.trim();
+              final amount = double.tryParse(amountController.text.trim());
+              final reason = reasonController.text.trim();
+              if (receipt.isEmpty || amount == null || amount <= 0 || reason.isEmpty) {
+                showCustomSnackBarHelper('please_fill_all_fields'.tr, isError: true);
                 return;
               }
               Navigator.of(dialogContext).pop();
-              showCustomSnackBarHelper(
-                '${'cashier_change_result'.tr}: ${CurrencyFormatter.format(received - total, currency: 'YER')}',
-                isError: false,
-              );
+              _confirmRefundExecution(receiptNumber: receipt, amount: amount, reason: reason);
             },
-            child: Text(
-              'cashier_calculate_change'.tr,
-              style: const TextStyle(color: Colors.white),
-            ),
+            child: Text('execute_transaction'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
+    receiptController.dispose();
+    amountController.dispose();
+    reasonController.dispose();
+  }
 
+  Future<void> _confirmRefundExecution({
+    required String receiptNumber,
+    required double amount,
+    required String reason,
+  }) async {
+    var verifying = false;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: Text('cashier_return_purchases'.tr, style: rubikBold),
+          content: Text(
+            '${'receipt_number'.tr}: $receiptNumber\n${'amount'.tr}: ${CurrencyFormatter.format(amount, currency: 'YER')}\n${'cashier_refund_reason'.tr}: $reason\n\n${'authenticate_to_confirm_transaction'.tr}',
+            style: rubikRegular,
+          ),
+          actions: [
+            TextButton(
+              onPressed: verifying ? null : () => Navigator.of(dialogContext).pop(),
+              child: Text('cancel'.tr),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+              onPressed: verifying ? null : () async {
+                setDialogState(() => verifying = true);
+                final authenticated = await _authenticateRefund();
+                if (!dialogContext.mounted) return;
+                if (!authenticated) {
+                  Navigator.of(dialogContext).pop();
+                  showCustomSnackBarHelper('transaction_authentication_cancelled'.tr, isError: true);
+                  return;
+                }
+                Navigator.of(dialogContext).pop();
+                final response = await Get.find<CashierAuthController>().authRepo.submitRefund(
+                  receiptNumber: receiptNumber,
+                  amount: amount,
+                  reason: reason,
+                );
+                final message = _refundResponseMessage(response);
+                showCustomSnackBarHelper(
+                  message ?? (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300
+                      ? 'cashier_refund_success'.tr
+                      : 'cashier_refund_failed'.tr),
+                  isError: response.statusCode == null || response.statusCode! < 200 || response.statusCode! >= 300,
+                );
+              },
+              child: verifying
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : Text('execute_transaction'.tr, style: const TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _authenticateRefund() async {
+    try {
+      final auth = LocalAuthentication();
+      return await auth.authenticate(
+        localizedReason: 'authenticate_to_confirm_transaction'.tr,
+        options: const AuthenticationOptions(
+          biometricOnly: false,
+          stickyAuth: true,
+        ),
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String? _refundResponseMessage(dynamic response) {
+    final body = response.body;
+    if (body is Map) {
+      final message = body['message'] ?? body['error'];
+      if (message != null && message.toString().trim().isNotEmpty) return message.toString();
+      final errors = body['errors'];
+      if (errors is Map && errors.isNotEmpty) {
+        final first = errors.values.first;
+        if (first is List && first.isNotEmpty) return first.first.toString();
+        return first.toString();
+      }
+    }
+    if (body is String && body.trim().isNotEmpty) return body.trim();
+    return response.statusText?.toString();
+  }
+
+  Future<void> _showChangeCalculator() async {
+    final totalController = TextEditingController();
+    final paidController = TextEditingController();
+    final receiptController = TextEditingController();
+    final changeController = TextEditingController();
+    String? validationError;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) {
+          void recalculate(String _) {
+            final total = double.tryParse(totalController.text.trim());
+            final paid = double.tryParse(paidController.text.trim());
+            if (total == null || paid == null) {
+              changeController.text = '';
+              validationError = null;
+            } else if (paid < total) {
+              changeController.text = '';
+              validationError = 'cashier_invalid_change_amount'.tr;
+            } else {
+              changeController.text = (paid - total).toStringAsFixed(2);
+              validationError = null;
+            }
+            setDialogState(() {});
+          }
+
+          final amount = double.tryParse(changeController.text.trim()) ?? 0;
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            title: Text('cashier_change_title'.tr, style: rubikBold),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: receiptController,
+                  decoration: InputDecoration(labelText: 'receipt_number'.tr),
+                ),
+                TextField(
+                  controller: totalController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: recalculate,
+                  decoration: InputDecoration(labelText: 'cashier_total_amount'.tr),
+                ),
+                TextField(
+                  controller: paidController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: recalculate,
+                  decoration: InputDecoration(labelText: 'cashier_paid_amount'.tr),
+                ),
+                TextField(
+                  controller: changeController,
+                  readOnly: true,
+                  decoration: InputDecoration(labelText: 'cashier_change_result'.tr),
+                ),
+                if (validationError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(validationError!, style: const TextStyle(color: Colors.red)),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text('cancel'.tr)),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+                onPressed: amount <= 0 || validationError != null
+                    ? null
+                    : () {
+                        Navigator.of(dialogContext).pop();
+                        final receipt = receiptController.text.trim();
+                        if (receipt.isEmpty) {
+                          showCustomSnackBarHelper('please_fill_all_fields'.tr, isError: true);
+                          return;
+                        }
+                        _confirmRefundExecution(
+                          receiptNumber: receipt,
+                          amount: amount,
+                          reason: 'إرجاع الباقي للعميل',
+                        );
+                      },
+                child: Text('execute_transaction'.tr, style: const TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
+      ),
+    );
     totalController.dispose();
-    receivedController.dispose();
+    paidController.dispose();
+    receiptController.dispose();
+    changeController.dispose();
   }
 
   Widget _buildStartSaleBigButton() {
@@ -1270,48 +1449,33 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
   //  يحتوي فقط على: (الرئيسية، محفظة الكاشير، سجل العمليات، الوردية، تسجيل الخروج)
   // ═══════════════════════════════════════════════════════════════
   Widget _buildBottomBar() {
-    return Container(
-      height: 64,
-      decoration: BoxDecoration(
+    return SafeArea(
+      top: false,
+      child: BottomAppBar(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+        elevation: 8,
+        shadowColor: ColorResources.getBlackAndWhite().withValues(alpha: 0.18),
+        surfaceTintColor: Colors.transparent,
+        shape: const AutomaticNotchedShape(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          CircleBorder(),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: ColorResources.getBlackAndWhite().withValues(alpha: 0.14),
-            blurRadius: 80,
-            offset: const Offset(0, 20),
+        notchMargin: 8,
+        padding: EdgeInsets.zero,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            children: [
+              Expanded(child: _buildBottomNavItem(index: 0, label: 'home'.tr, icon: Icons.home_rounded)),
+              Expanded(child: _buildBottomNavItem(index: 1, label: 'notification'.tr, icon: Icons.notifications_rounded)),
+              const SizedBox(width: 72),
+              Expanded(child: _buildBottomNavItem(index: 2, label: 'history'.tr, icon: Icons.history_rounded)),
+              Expanded(child: _buildBottomNavItem(index: 3, label: 'profile'.tr, icon: Icons.person_rounded)),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildBottomNavItem(
-            index: 0,
-            label: 'الرئيسية',
-            icon: Icons.home_rounded,
-          ),
-          _buildBottomNavItem(
-            index: 1,
-            label: 'محفظة الكاشير',
-            icon: Icons.account_balance_wallet_rounded,
-          ),
-          // مساحة محجوزة للزر العائم في المنتصف (بدء بيع)
-          const SizedBox(height: 20, width: 44),
-          _buildBottomNavItem(
-            index: 2,
-            label: 'سجل العمليات',
-            icon: Icons.receipt_long_rounded,
-          ),
-          _buildBottomNavItem(
-            index: 3,
-            label: 'الوردية',
-            icon: Icons.history_toggle_off_rounded,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1321,29 +1485,24 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
     required String label,
     required IconData icon,
   }) {
-    final isSelected = _currentIndex == index;
+    final isSelected = _currentNavIndex == index;
     return InkWell(
       onTap: () => _onTabSelect(index),
       borderRadius: BorderRadius.circular(10),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 22,
-              color: isSelected ? kPrimaryColor : const Color(0xFF8E8E93),
-            ),
+            Icon(icon, size: 22, color: isSelected ? kPrimaryColor : const Color(0xFF8E8E93)),
             const SizedBox(height: 3),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: isSelected
                   ? rubikBold.copyWith(fontSize: 10, color: kPrimaryColor)
-                  : rubikRegular.copyWith(
-                      fontSize: 10,
-                      color: const Color(0xFF8E8E93),
-                    ),
+                  : rubikRegular.copyWith(fontSize: 10, color: const Color(0xFF8E8E93)),
             ),
           ],
         ),
