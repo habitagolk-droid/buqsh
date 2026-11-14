@@ -1,0 +1,35 @@
+import 'package:flutter/material.dart';
+
+ThemeData dark = ThemeData(
+  fontFamily: 'Cairo',
+  primaryColor: const Color(0xFF689da7),
+  secondaryHeaderColor: const Color(0xFFaaa818),
+  brightness: Brightness.dark,
+  shadowColor: Colors.black.withOpacity(0.4),
+  cardColor: const Color(0xFF29292D),
+  textTheme: const TextTheme(
+    titleLarge: TextStyle(color: Color(0xFF8dbac3), fontSize: 18, fontWeight: FontWeight.w700),
+    titleMedium: TextStyle(color: Color(0xFFF3F4F6), fontSize: 16, fontWeight: FontWeight.w600),
+    titleSmall: TextStyle(color: Color(0xFFF3F4F6), fontSize: 14, fontWeight: FontWeight.w600),
+    bodyLarge: TextStyle(color: Color(0xFFF3F4F6), fontSize: 14, fontWeight: FontWeight.w500),
+    bodyMedium: TextStyle(color: Color(0xFFD1D5DB), fontSize: 14, fontWeight: FontWeight.w500),
+    bodySmall: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12, fontWeight: FontWeight.w500),
+    labelLarge: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+    labelSmall: TextStyle(color: Color(0xFF9CA3AF), fontSize: 12, fontWeight: FontWeight.w500),
+  ),
+  dialogTheme: const DialogThemeData(surfaceTintColor: Colors.black),
+  colorScheme: ColorScheme(
+    brightness: Brightness.dark,
+    background: const Color(0xFF212121),
+    onBackground: const Color(0xFFC3CAD9),
+    primary: const Color(0xFF689da7),
+    onPrimary: const Color(0xFF689da7),
+    secondary: const Color(0xFFaaa818),
+    onSecondary: const Color(0xFFaaa818),
+    error: Colors.redAccent,
+    onError: Colors.redAccent,
+    surface: Colors.black,
+    onSurface:  Colors.white70,
+    shadow: Colors.black.withOpacity(0.4),
+  ),
+);
