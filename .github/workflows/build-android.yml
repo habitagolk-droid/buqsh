@@ -56,6 +56,13 @@ jobs:
           test -f "$WEBVIEW_GRADLE"
           sed -i 's/proguard-android\.txt/proguard-android-optimize.txt/g' "$WEBVIEW_GRADLE"
 
+      - name: Patch legacy app_settings Gradle script
+        run: |
+          APP_SETTINGS_GRADLE="$HOME/.pub-cache/hosted/pub.dev/app_settings-5.2.0/android/build.gradle"
+          test -f "$APP_SETTINGS_GRADLE"
+          sed -i "/apply plugin: 'kotlin-android'/d; s/compileSdkVersion 33/compileSdk 36/" "$APP_SETTINGS_GRADLE"
+          sed -i '/^[[:space:]]*kotlinOptions {[[:space:]]*$/,+2d' "$APP_SETTINGS_GRADLE"
+
       # The repository intentionally does not track gradlew/gradle-wrapper.jar.
       # Generate the wrapper from the Gradle version declared by the project.
       - name: Set up Gradle 9.3.1 and generate wrapper
