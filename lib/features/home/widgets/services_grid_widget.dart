@@ -27,6 +27,22 @@ class _ServiceItem {
 class ServicesGridWidget extends StatelessWidget {
   const ServicesGridWidget({Key? key}) : super(key: key);
 
+  static const Color _colorPrimaryDark = Color(0xFF003840);
+  static const Color _colorSecondary = Color(0xFF086048);
+  static const Color _colorAccent = Color(0xFFB8F8A8);
+  static const Color _colorMint = Color(0xFF50D0A0);
+  static const Color _colorIconCircleBg = Color(0xFFE0F5EC);
+  static const Color _colorScreenBg = Color(0xFFF2FAF5);
+  static const Color _colorCardBg = Color(0xFFFFFFFF);
+
+  bool _hasAccentDetail(IconData icon) =>
+      icon == Icons.swap_horiz_outlined ||
+      icon == Icons.send_outlined ||
+      icon == Icons.add_circle_outline ||
+      icon == Icons.arrow_circle_down_outlined ||
+      icon == Icons.point_of_sale_outlined ||
+      icon == Icons.receipt_long_outlined;
+
   List<_ServiceItem> _getServices() {
     return [
       // 1. svc_transfer
@@ -240,113 +256,174 @@ class ServicesGridWidget extends StatelessWidget {
     final isCashier = Get.find<CashierAuthController>().isSessionReady;
     final services = isCashier ? _getCashierServices(context) : _getServices();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: Dimensions.paddingSizeDefault,
-        vertical: Dimensions.paddingSizeSmall,
-      ),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: services.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.92,
+    return Container(
+      color: isCashier ? Colors.transparent : _colorScreenBg,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.paddingSizeDefault,
+          vertical: Dimensions.paddingSizeSmall,
         ),
-        itemBuilder: (context, index) {
-          final service = services[index];
-          return Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(
-                    Dimensions.radiusSizeDefault,
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: services.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: isCashier ? 8 : 12,
+            crossAxisSpacing: isCashier ? 8 : 12,
+            childAspectRatio: isCashier ? 0.92 : 1.0,
+          ),
+          itemBuilder: (context, index) {
+            final service = services[index];
+            final cardRadius =
+                isCashier ? Dimensions.radiusSizeDefault : 16.0;
+            return Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: isCashier ? Theme.of(context).cardColor : _colorCardBg,
+                    borderRadius: BorderRadius.circular(cardRadius),
+                    boxShadow: isCashier
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : const [
+                            BoxShadow(
+                              color: Color(0x0F003840),
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                              spreadRadius: 0.5,
+                            ),
+                          ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: CustomInkWellWidget(
-                  onTap: service.onTap,
-                  radius: Dimensions.radiusSizeDefault,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: Dimensions.paddingSizeExtraSmall,
-                        vertical: Dimensions.paddingSizeExtraSmall,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(
-                                context,
-                              ).primaryColor.withOpacity(0.08),
+                  child: CustomInkWellWidget(
+                    onTap: service.onTap,
+                    radius: cardRadius,
+                    child: Center(
+                      child: Padding(
+                        padding: isCashier
+                            ? const EdgeInsets.symmetric(
+                                horizontal: Dimensions.paddingSizeExtraSmall,
+                                vertical: Dimensions.paddingSizeExtraSmall,
+                              )
+                            : const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 0,
+                              ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: isCashier ? null : 48,
+                              height: isCashier ? null : 48,
+                              padding: isCashier
+                                  ? const EdgeInsets.all(8)
+                                  : EdgeInsets.zero,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isCashier
+                                    ? Theme.of(
+                                        context,
+                                      ).primaryColor.withOpacity(0.08)
+                                    : _colorIconCircleBg,
+                              ),
+                              child: isCashier
+                                  ? Icon(
+                                      service.icon,
+                                      size: 28,
+                                      color: Theme.of(context).primaryColor,
+                                    )
+                                  : Stack(
+                                      alignment: Alignment.center,
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Icon(
+                                          service.icon,
+                                          size: 28,
+                                          color: _colorSecondary,
+                                        ),
+                                        if (_hasAccentDetail(service.icon))
+                                          Positioned(
+                                            top: 0,
+                                            right: 0,
+                                            child: Container(
+                                              width: 7,
+                                              height: 7,
+                                              decoration: BoxDecoration(
+                                                color: _colorAccent,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: _colorIconCircleBg,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                             ),
-                            child: Icon(
-                              service.icon,
-                              size: 28,
-                              color: Theme.of(context).primaryColor,
+                            SizedBox(height: isCashier ? 6 : 8),
+                            Text(
+                              service.key.tr,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: isCashier
+                                  ? rubikSemiBold.copyWith(
+                                      fontSize: Dimensions.fontSizeSmall,
+                                      color:
+                                          Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge
+                                              ?.color ??
+                                          ColorResources.getTextColor(),
+                                    )
+                                  : const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: _colorSecondary,
+                                    ),
                             ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            service.key.tr,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: rubikSemiBold.copyWith(
-                              fontSize: Dimensions.fontSizeSmall,
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.color ??
-                                  ColorResources.getTextColor(),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // شارة NEW لخدمة بقشي
-              if (service.hasNewBadge)
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'new'.tr,
-                      style: rubikSemiBold.copyWith(
-                        fontSize: 8,
-                        color: Colors.white,
+                // شارة NEW لخدمة بقشي
+                if (service.hasNewBadge)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isCashier
+                            ? Theme.of(context).primaryColor
+                            : _colorMint,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'new'.tr,
+                        style: rubikSemiBold.copyWith(
+                          fontSize: 8,
+                          color: isCashier ? Colors.white : _colorPrimaryDark,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
