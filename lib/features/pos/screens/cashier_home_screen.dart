@@ -6,7 +6,6 @@ import 'package:six_cash/features/pos/screens/cashier_wallets_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/color_resources.dart';
-import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
 import 'package:six_cash/utils/currency_formatter.dart';
 
@@ -22,7 +21,7 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
 
   static const Color _primary = ColorResources.primaryColor;
   static const Color _background = Color(0xFFF3F2F7);
-  static const Color _accent = ColorResources.errorColor;
+  static const Color _accent = Color(0xFFD32F2F);
 
   @override
   void initState() {
@@ -45,6 +44,9 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _background,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: _buildCenterFab(),
+      bottomNavigationBar: _buildBottomBar(),
       body: SafeArea(
         bottom: false,
         child: GetBuilder<CashierAuthController>(
@@ -75,7 +77,7 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
                         _buildSyncNotice(controller),
                         const SizedBox(height: 20),
                         _buildWalletCard(controller),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 26),
                         _buildQuickActions(),
                         const SizedBox(height: 26),
                         _buildSectionHeader('العمليات'),
@@ -90,14 +92,13 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           },
         ),
       ),
-      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
   Widget _buildHeader(CashierAuthController controller) {
     final info = controller.sessionInfo;
-    final name = info?.cashierName?.trim().isNotEmpty == true
-        ? info!.cashierName
+    final cashierName = info?.cashierName?.trim().isNotEmpty == true
+        ? info!.cashierName!
         : 'كاشير بقش';
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 14, 24, 18),
@@ -110,20 +111,27 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Icon(Icons.point_of_sale_rounded,
-                color: _accent, size: 31),
+            child: const Icon(
+              Icons.point_of_sale_rounded,
+              color: _accent,
+              size: 31,
+            ),
           ),
           const Spacer(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('مساء الخير',
-                  style: rubikBold.copyWith(fontSize: 24, color: _primary)),
+              Text(
+                'مساء الخير',
+                style: rubikBold.copyWith(fontSize: 24, color: _primary),
+              ),
               const SizedBox(height: 2),
-              Text(name!,
-                  style: rubikRegular.copyWith(fontSize: 19, color: _primary),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
+              Text(
+                cashierName,
+                style: rubikRegular.copyWith(fontSize: 19, color: _primary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ],
@@ -139,16 +147,16 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
         borderRadius: BorderRadius.circular(14),
         onTap: controller.isSessionInfoLoading
             ? null
-            : () => controller.retrySessionInfo(),
+            : controller.retrySessionInfo,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
               IconButton(
                 visualDensity: VisualDensity.compact,
                 onPressed: controller.isSessionInfoLoading
                     ? null
-                    : () => controller.retrySessionInfo(),
+                    : controller.retrySessionInfo,
                 icon: const Icon(Icons.close, color: _accent, size: 24),
               ),
               Expanded(
@@ -161,14 +169,14 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
               ),
               controller.isSessionInfoLoading
                   ? const SizedBox(
-                      width: 26,
-                      height: 26,
+                      width: 24,
+                      height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
                         color: _accent,
                       ),
                     )
-                  : const Icon(Icons.sync_rounded, color: _accent, size: 28),
+                  : const Icon(Icons.sync_rounded, color: _accent, size: 27),
             ],
           ),
         ),
@@ -181,11 +189,11 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
     final walletController = Get.isRegistered<CashierWalletController>()
         ? Get.find<CashierWalletController>()
         : null;
-    final wallet = walletController?.wallets.firstWhereOrNull(
+    final wallet = walletController?.cashierWallets.firstWhereOrNull(
       (item) => item.currencyCode.toUpperCase() == 'YER',
     );
     final balance = wallet?.currentBalance;
-    final terminalName = info?.terminalName ?? 'نقطة بقش';
+
     return Container(
       constraints: const BoxConstraints(minHeight: 300),
       width: double.infinity,
@@ -211,7 +219,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
               height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.12), width: 22),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.12),
+                  width: 22,
+                ),
               ),
             ),
           ),
@@ -220,29 +231,41 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.account_balance_wallet_rounded,
-                      color: Colors.white, size: 42),
+                  const Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: Colors.white,
+                    size: 42,
+                  ),
                   const Spacer(),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('حساب',
-                          style: rubikRegular.copyWith(
-                              color: Colors.white.withOpacity(0.82),
-                              fontSize: 17)),
-                      Text(info?.branchName ?? 'نقطة البيع',
-                          style: rubikBold.copyWith(
-                              color: Colors.white, fontSize: 21),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
+                      Text(
+                        'حساب',
+                        style: rubikRegular.copyWith(
+                          color: Colors.white.withOpacity(0.82),
+                          fontSize: 17,
+                        ),
+                      ),
+                      Text(
+                        info?.branchName ?? 'نقطة البيع',
+                        style: rubikBold.copyWith(
+                          color: Colors.white,
+                          fontSize: 21,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              Text(terminalName,
-                  textAlign: TextAlign.end,
-                  style: rubikBold.copyWith(color: Colors.white, fontSize: 18)),
+              Text(
+                info?.terminalName ?? 'نقطة بقش',
+                textAlign: TextAlign.end,
+                style: rubikBold.copyWith(color: Colors.white, fontSize: 18),
+              ),
               const SizedBox(height: 10),
               Text(
                 balance == null
@@ -250,7 +273,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
                     : CurrencyFormatter.format(balance, currency: 'YER'),
                 textAlign: TextAlign.end,
                 style: rubikBold.copyWith(
-                    color: Colors.white, fontSize: 27, letterSpacing: 2),
+                  color: Colors.white,
+                  fontSize: 27,
+                  letterSpacing: 2,
+                ),
               ),
               const Spacer(),
               Align(
@@ -260,8 +286,11 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
                   onPressed: walletController == null
                       ? null
                       : () => walletController.fetchCashierWallets(),
-                  icon: const Icon(Icons.visibility_off_outlined,
-                      color: Colors.white, size: 26),
+                  icon: const Icon(
+                    Icons.visibility_off_outlined,
+                    color: Colors.white,
+                    size: 26,
+                  ),
                 ),
               ),
             ],
@@ -271,26 +300,44 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
     );
   }
 
+  // Keep the five services shown in the reference home screen.
   Widget _buildQuickActions() {
     final actions = <_CashierAction>[
-      _CashierAction('إتمام عملية بيع', Icons.point_of_sale_rounded,
-          () => Get.toNamed(RouteHelper.cashierPosSale)),
-      _CashierAction('المحفظة', Icons.account_balance_wallet_outlined,
-          () => Get.toNamed(RouteHelper.cashierWallets)),
-      _CashierAction('سجل العمليات', Icons.receipt_long_outlined,
-          () => setState(() => _currentIndex = 1)),
-      _CashierAction('إدارة الوردية', Icons.access_time_rounded,
-          () => _showShiftSheet()),
-      _CashierAction('المفضلة', Icons.favorite_border,
-          () => showCustomSnackBarHelper('قريباً', isError: false)),
+      _CashierAction(
+        'إرجاع مشتريات',
+        Icons.shopping_bag_outlined,
+        _showRefundDialog,
+      ),
+      _CashierAction(
+        'الباقي',
+        Icons.payments_outlined,
+        () => Get.toNamed(RouteHelper.cashierWallets),
+      ),
+      _CashierAction(
+        'الشحن والسداد',
+        Icons.phone_android_rounded,
+        () => Get.toNamed(RouteHelper.cashierPosSale),
+      ),
+      _CashierAction(
+        'التقارير',
+        Icons.format_list_bulleted_rounded,
+        () => setState(() => _currentIndex = 1),
+      ),
+      _CashierAction(
+        'المفضلة',
+        Icons.favorite_border_rounded,
+        () => Get.toNamed(RouteHelper.posPayment),
+      ),
     ];
+    final tileWidth = (MediaQuery.of(context).size.width - 64) / 3;
+
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       children: actions.map((action) {
         return SizedBox(
-          width: (MediaQuery.of(context).size.width - 64) / 2,
-          height: 132,
+          width: tileWidth,
+          height: 142,
           child: Material(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -300,14 +347,25 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(action.icon,
-                      color: action.label == 'المفضلة' ? _accent : _primary,
-                      size: 34),
+                  Icon(
+                    action.icon,
+                    color: action.label == 'المفضلة' ? _accent : _primary,
+                    size: 36,
+                  ),
                   const SizedBox(height: 12),
-                  Text(action.label,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      action.label,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: rubikRegular.copyWith(
-                          fontSize: 17, color: _primary)),
+                        fontSize: 15,
+                        color: _primary,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -319,8 +377,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
 
   Widget _buildSectionHeader(String text) => Align(
         alignment: AlignmentDirectional.centerEnd,
-        child: Text(text,
-            style: rubikBold.copyWith(fontSize: 27, color: _primary)),
+        child: Text(
+          text,
+          style: rubikBold.copyWith(fontSize: 27, color: _primary),
+        ),
       );
 
   Widget _buildRecentActivity(CashierAuthController controller) {
@@ -354,8 +414,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
                 Text('مبيعات الوردية',
                     style: rubikBold.copyWith(color: _primary)),
                 const SizedBox(height: 5),
-                Text('$count عملية • ${CurrencyFormatter.format(total, currency: 'YER')}',
-                    style: rubikRegular.copyWith(color: Colors.grey[600])),
+                Text(
+                  '$count عملية • ${CurrencyFormatter.format(total, currency: 'YER')}',
+                  style: rubikRegular.copyWith(color: Colors.grey[600]),
+                ),
               ],
             ),
           ),
@@ -397,9 +459,10 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
       onTap: () {
         if (index == 3) {
           _confirmLogout(context);
+        } else if (index == 2) {
+          Get.toNamed(RouteHelper.cashierPosSale);
         } else {
-          setState(() => _currentIndex = index == 2 ? 0 : index);
-          if (index == 2) Get.toNamed(RouteHelper.cashierPosSale);
+          setState(() => _currentIndex = index);
         }
       },
       child: SizedBox(
@@ -409,9 +472,13 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           children: [
             Icon(icon, size: 24, color: selected ? _accent : Colors.grey[500]),
             const SizedBox(height: 3),
-            Text(label,
-                style: rubikRegular.copyWith(
-                    fontSize: 11, color: selected ? _accent : Colors.grey[500])),
+            Text(
+              label,
+              style: rubikRegular.copyWith(
+                fontSize: 11,
+                color: selected ? _accent : Colors.grey[500],
+              ),
+            ),
           ],
         ),
       ),
@@ -427,8 +494,11 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
         backgroundColor: const Color(0xFF28282A),
         elevation: 5,
         onPressed: () => Get.toNamed(RouteHelper.cashierPosSale),
-        child: const Icon(Icons.point_of_sale_rounded,
-            color: Colors.white, size: 31),
+        child: const Icon(
+          Icons.point_of_sale_rounded,
+          color: Colors.white,
+          size: 31,
+        ),
       ),
     );
   }
@@ -449,9 +519,11 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('الوردية الحالية',
-                  textAlign: TextAlign.center,
-                  style: rubikBold.copyWith(fontSize: 22, color: _primary)),
+              Text(
+                'الوردية الحالية',
+                textAlign: TextAlign.center,
+                style: rubikBold.copyWith(fontSize: 22, color: _primary),
+              ),
               const SizedBox(height: 18),
               _shiftLine('الكاشير', controller.sessionInfo?.cashierName ?? '—'),
               _shiftLine('الجهاز', controller.sessionInfo?.terminalName ?? '—'),
@@ -484,13 +556,49 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
           children: [
             Text(label, style: rubikRegular.copyWith(color: Colors.grey[600])),
             Flexible(
-              child: Text(value,
-                  textAlign: TextAlign.end,
-                  style: rubikBold.copyWith(color: _primary)),
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                style: rubikBold.copyWith(color: _primary),
+              ),
             ),
           ],
         ),
       );
+
+  void _showRefundDialog() {
+    final receiptController = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إرجاع مشتريات'),
+        content: TextField(
+          controller: receiptController,
+          decoration: const InputDecoration(
+            labelText: 'رقم الإيصال / رقم العملية',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إلغاء'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              if (receiptController.text.trim().isNotEmpty) {
+                showCustomSnackBarHelper(
+                  'خدمة إرجاع المشتريات غير متاحة حالياً',
+                  isError: true,
+                );
+              }
+            },
+            child: const Text('متابعة'),
+          ),
+        ],
+      ),
+    ).whenComplete(receiptController.dispose);
+  }
 
   void _confirmLogout(BuildContext context) {
     showDialog<void>(
