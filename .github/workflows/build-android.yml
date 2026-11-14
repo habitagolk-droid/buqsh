@@ -60,7 +60,7 @@ jobs:
         run: |
           APP_SETTINGS_GRADLE="$HOME/.pub-cache/hosted/pub.dev/app_settings-5.2.0/android/build.gradle"
           test -f "$APP_SETTINGS_GRADLE"
-          sed -i "/apply plugin: 'kotlin-android'/d; s/compileSdkVersion 33/compileSdk 36/" "$APP_SETTINGS_GRADLE"
+          sed -i "/apply plugin: 'kotlin-android'/d; s/compileSdkVersion 33/compileSdk 36/; s/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g" "$APP_SETTINGS_GRADLE"
           sed -i '/^[[:space:]]*kotlinOptions {[[:space:]]*$/,+2d' "$APP_SETTINGS_GRADLE"
 
       - name: Normalize cached Flutter plugin Gradle scripts for AGP 9
