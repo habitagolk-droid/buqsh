@@ -50,14 +50,14 @@ jobs:
 
       # The repository intentionally does not track gradlew/gradle-wrapper.jar.
       # Generate the wrapper from the Gradle version declared by the project.
-      - name: Set up Gradle 8.14 and generate wrapper
+      - name: Set up Gradle 9.3.1 and generate wrapper
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.14'
+          gradle-version: '9.3.1'
 
       - name: Generate Gradle wrapper
         run: |
-          gradle -p android wrapper --gradle-version 8.14 --distribution-type bin
+          gradle -p android wrapper --gradle-version 9.3.1 --distribution-type bin
           chmod +x android/gradlew
 
       - name: Build release APKs
