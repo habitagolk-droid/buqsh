@@ -1,4 +1,4 @@
-name: Build Android
+name: Build Android Release APK
 
 on:
   push:
@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-android:
-    name: Build APK and AAB
+  build-release-apk:
+    name: Build Release APK
     runs-on: ubuntu-24.04
     timeout-minutes: 45
 
@@ -93,24 +93,13 @@ jobs:
           gradle -p android wrapper --gradle-version 9.3.1 --distribution-type bin
           chmod +x android/gradlew
 
-      - name: Build release APKs
-        run: flutter build apk --release --split-per-abi
-
-      - name: Build release App Bundle
-        run: flutter build appbundle --release
+      - name: Build universal release APK
+        run: flutter build apk --release
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: buqsh-android-apks-${{ github.sha }}
+          name: buqsh-android-release-apk-${{ github.sha }}
           if-no-files-found: error
-          path: build/app/outputs/flutter-apk/*.apk
-          retention-days: 14
-
-      - name: Upload App Bundle artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: buqsh-android-aab-${{ github.sha }}
-          if-no-files-found: error
-          path: build/app/outputs/bundle/release/*.aab
+          path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 14
