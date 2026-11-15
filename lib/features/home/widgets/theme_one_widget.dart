@@ -20,7 +20,7 @@ class ThemeOneWidget extends StatelessWidget {
               height: 140.0,
               color: Theme.of(context).primaryColor,
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(bottom: 100),
               child: Column(
                 children: [
