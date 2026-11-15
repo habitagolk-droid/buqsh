@@ -6,6 +6,7 @@ import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart
 import 'package:six_cash/features/pos/screens/cashier_wallets_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_pos_sale_screen.dart';
 import 'package:six_cash/features/pos/screens/pos_payment_screen.dart';
+import 'package:six_cash/features/home/screens/nav_bar_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/color_resources.dart';
@@ -32,20 +33,6 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final authCtrl = Get.find<CashierAuthController>();
-      if (!authCtrl.isSessionReady) {
-        await authCtrl.restoreSession();
-      }
-      if (!mounted || !authCtrl.isSessionReady) return;
-      await authCtrl.fetchCurrentShift();
-      if (Get.isRegistered<CashierWalletController>()) {
-        await Get.find<CashierWalletController>().fetchCashierWallets(
-          showLoading: false,
-        );
-      }
-    });
   }
 
   void _onTabSelect(int index) {
@@ -68,22 +55,7 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBgColor,
-      drawer: _buildCashierOnlyDrawer(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _buildCenterFloatingActionButton(),
-      bottomNavigationBar: _buildBottomBar(),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          _buildHomeTab(),
-          const CashierWalletsScreen(),
-          _buildTransactionsTab(),
-          _buildShiftTab(),
-        ],
-      ),
-    );
+    return const NavBarScreen();
   }
 
   // ═══════════════════════════════════════════════════════════════

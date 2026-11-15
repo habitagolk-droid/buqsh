@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:six_cash/common/widgets/custom_ink_well_widget.dart';
 import 'package:six_cash/features/transaction_money/screens/send_money_screen.dart';
 import 'package:six_cash/features/transaction_money/screens/transaction_balance_input_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
-import 'package:six_cash/util/color_resources.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
 
@@ -140,42 +140,125 @@ class ServicesGridWidget extends StatelessWidget {
     ];
   }
 
-  void _showRefundDialog(BuildContext context) {
-    final txController = TextEditingController();
-    showDialog(
+  Future<void> _showRefundDialog(BuildContext context) async {
+    final receiptController = TextEditingController();
+    final amountController = TextEditingController();
+    final reasonController = TextEditingController();
+    await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('إرجاع مبلغ (Refund)', style: rubikBold),
-        content: Column(
+        title: Text('cashier_return_purchases'.tr, style: rubikBold),
+        content: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('أدخل رقم الإيصال أو العملية لإرجاعها:', style: rubikRegular),
-            const SizedBox(height: 10),
             TextField(
-              controller: txController,
-              decoration: InputDecoration(
-                hintText: 'رقم الإيصال / Transaction ID',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+              controller: receiptController,
+              decoration: InputDecoration(labelText: 'receipt_number'.tr),
+            ),
+            TextField(
+              controller: amountController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: 'cashier_refund_amount'.tr),
+            ),
+            TextField(
+              controller: reasonController,
+              decoration: InputDecoration(labelText: 'cashier_refund_reason'.tr),
             ),
           ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('إلغاء')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF004D40)),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              if (txController.text.trim().isNotEmpty) {
-                showCustomSnackBarHelper('تم تقديم طلب الإرجاع بنجاح للعملية #${txController.text.trim()}', isError: false);
+            onPressed: () async {
+              final receipt = receiptController.text.trim();
+              final amount = double.tryParse(amountController.text.trim());
+              final reason = reasonController.text.trim();
+              if (receipt.isEmpty || amount == null || amount <= 0 || reason.isEmpty) {
+                showCustomSnackBarHelper('please_fill_all_fields'.tr, isError: true);
+                return;
               }
+              Navigator.of(ctx).pop();
+              await _confirmAndSubmitRefund(
+                context,
+                receiptNumber: receipt,
+                amount: amount,
+                reason: reason,
+              );
             },
-            child: const Text('تأكيد الإرجاع', style: TextStyle(color: Colors.white)),
+            child: Text('execute_transaction'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
+    );
+    receiptController.dispose();
+    amountController.dispose();
+    reasonController.dispose();
+  }
+
+  Future<void> _confirmAndSubmitRefund(
+    BuildContext context, {
+    required String receiptNumber,
+    required double amount,
+    required String reason,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('cashier_return_purchases'.tr, style: rubikBold),
+        content: Text(
+          '${'receipt_number'.tr}: $receiptNumber\n${'cashier_refund_amount'.tr}: $amount\n${'cashier_refund_reason'.tr}: $reason\n\n${'authenticate_to_confirm_transaction'.tr}',
+          style: rubikRegular,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('cancel'.tr)),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('execute_transaction'.tr),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    bool authenticated;
+    try {
+      authenticated = await LocalAuthentication().authenticate(
+        localizedReason: 'authenticate_to_confirm_transaction'.tr,
+        options: const AuthenticationOptions(biometricOnly: false, stickyAuth: true),
+      );
+    } catch (_) {
+      authenticated = false;
+    }
+    if (!authenticated) {
+      showCustomSnackBarHelper('transaction_authentication_cancelled'.tr, isError: true);
+      return;
+    }
+
+    final response = await Get.find<CashierAuthController>().authRepo.submitRefund(
+      receiptNumber: receiptNumber,
+      amount: amount,
+      reason: reason,
+    );
+    final body = response.body;
+    String? serverMessage;
+    if (body is Map) {
+      serverMessage = (body['message'] ?? body['error'])?.toString();
+      final errors = body['errors'];
+      if ((serverMessage == null || serverMessage.isEmpty) && errors is Map && errors.isNotEmpty) {
+        final first = errors.values.first;
+        serverMessage = first is List && first.isNotEmpty ? first.first.toString() : first.toString();
+      }
+    }
+    final succeeded = response.statusCode != null &&
+        response.statusCode! >= 200 && response.statusCode! < 300;
+    showCustomSnackBarHelper(
+      serverMessage ?? (succeeded ? 'cashier_refund_success'.tr : 'cashier_refund_failed'.tr),
+      isError: !succeeded,
     );
   }
 
@@ -257,7 +340,7 @@ class ServicesGridWidget extends StatelessWidget {
     final services = isCashier ? _getCashierServices(context) : _getServices();
 
     return Container(
-      color: isCashier ? Colors.transparent : _colorScreenBg,
+      color: _colorScreenBg,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: Dimensions.paddingSizeDefault,
@@ -269,75 +352,48 @@ class ServicesGridWidget extends StatelessWidget {
           itemCount: services.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            mainAxisSpacing: isCashier ? 8 : 12,
-            crossAxisSpacing: isCashier ? 8 : 12,
-            childAspectRatio: isCashier ? 0.92 : 1.0,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.0,
           ),
           itemBuilder: (context, index) {
             final service = services[index];
-            final cardRadius =
-                isCashier ? Dimensions.radiusSizeDefault : 16.0;
+            const cardRadius = 16.0;
             return Stack(
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: isCashier ? Theme.of(context).cardColor : _colorCardBg,
+                    color: _colorCardBg,
                     borderRadius: BorderRadius.circular(cardRadius),
-                    boxShadow: isCashier
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : const [
-                            BoxShadow(
-                              color: Color(0x0F003840),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                              spreadRadius: 0.5,
-                            ),
-                          ],
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x0F003840),
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                        spreadRadius: 0.5,
+                      ),
+                    ],
                   ),
                   child: CustomInkWellWidget(
                     onTap: service.onTap,
                     radius: cardRadius,
                     child: Center(
                       child: Padding(
-                        padding: isCashier
-                            ? const EdgeInsets.symmetric(
-                                horizontal: Dimensions.paddingSizeExtraSmall,
-                                vertical: Dimensions.paddingSizeExtraSmall,
-                              )
-                            : const EdgeInsets.symmetric(
-                                horizontal: 4,
-                                vertical: 0,
-                              ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 0,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: isCashier ? null : 48,
-                              height: isCashier ? null : 48,
-                              padding: isCashier
-                                  ? const EdgeInsets.all(8)
-                                  : EdgeInsets.zero,
+                              width: 48,
+                              height: 48,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isCashier
-                                    ? Theme.of(
-                                        context,
-                                      ).primaryColor.withOpacity(0.08)
-                                    : _colorIconCircleBg,
+                                color: _colorIconCircleBg,
                               ),
-                              child: isCashier
-                                  ? Icon(
-                                      service.icon,
-                                      size: 28,
-                                      color: Theme.of(context).primaryColor,
-                                    )
-                                  : Stack(
+                              child: Stack(
                                       alignment: Alignment.center,
                                       clipBehavior: Clip.none,
                                       children: [
@@ -366,27 +422,17 @@ class ServicesGridWidget extends StatelessWidget {
                                       ],
                                     ),
                             ),
-                            SizedBox(height: isCashier ? 6 : 8),
+                            const SizedBox(height: 8),
                             Text(
                               service.key.tr,
                               textAlign: TextAlign.center,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: isCashier
-                                  ? rubikSemiBold.copyWith(
-                                      fontSize: Dimensions.fontSizeSmall,
-                                      color:
-                                          Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
-                                              ?.color ??
-                                          ColorResources.getTextColor(),
-                                    )
-                                  : const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: _colorSecondary,
-                                    ),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _colorSecondary,
+                              ),
                             ),
                           ],
                         ),
@@ -406,16 +452,14 @@ class ServicesGridWidget extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: isCashier
-                            ? Theme.of(context).primaryColor
-                            : _colorMint,
+                        color: _colorMint,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         'new'.tr,
                         style: rubikSemiBold.copyWith(
                           fontSize: 8,
-                          color: isCashier ? Colors.white : _colorPrimaryDark,
+                          color: _colorPrimaryDark,
                         ),
                       ),
                     ),

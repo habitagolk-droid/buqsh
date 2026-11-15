@@ -20,6 +20,7 @@ import 'package:six_cash/features/home/widgets/theme_two_widget.dart';
 import 'package:six_cash/features/home/widgets/theme_three_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,9 +30,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadData(BuildContext context, bool reload) async {
-
     if (reload) {
       Get.find<SplashController>().getConfigData();
+    }
+
+    if (Get.find<CashierAuthController>().isSessionReady) {
+      if (reload && Get.isRegistered<CashierWalletController>()) {
+        await Get.find<CashierWalletController>().fetchCashierWallets(
+          showLoading: true,
+        );
+      }
+      await Get.find<CashierAuthController>().fetchCurrentShift();
+      return;
     }
 
     Get.find<ProfileController>().getProfileData(reload: reload);
@@ -67,9 +77,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<HomeController>(
-      builder: (controller) {
-        final isCashier = Get.find<CashierAuthController>().isSessionReady;
+    return GetBuilder<CashierAuthController>(
+      builder: (cashierController) => GetBuilder<HomeController>(
+        builder: (controller) {
+        final isCashier = cashierController.isSessionReady;
         return Scaffold(
           appBar: const HomeAppBarWidget(),
           body: ExpandableBottomSheet(
@@ -84,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashController.configModel!.themeIndex ?? 1;
                     return Column(
                       children: [
-                        themeIndex == 1
+                        isCashier || themeIndex == 1
                             ? const ThemeOneWidget()
                             : themeIndex == 2
                             ? const ThemeTwoWidget()
@@ -109,7 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 : const BottomSheetContentWidget(),
           ),
         );
-      },
+        },
+      ),
     );
   }
 }

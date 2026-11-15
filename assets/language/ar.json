@@ -460,6 +460,7 @@
   "cashier_refund_reason": "سبب الإرجاع",
   "cashier_refund_success": "تم تنفيذ الإرجاع بنجاح",
   "cashier_refund_failed": "تعذر تنفيذ الإرجاع، تحقق من البيانات وحاول مجدداً",
+  "cashier": "الكاشير",
   "cashier_refund_short": "استرجاع آمن للمشتريات",
   "cashier_invalid_change_amount": "أدخل مبلغاً صحيحاً وتأكد أن المبلغ المستلم يغطي قيمة المشتريات.",
   "cashier_change_calculator": "الباقي",

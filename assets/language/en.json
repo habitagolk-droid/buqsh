@@ -457,6 +457,7 @@
   "cashier_refund_reason": "Refund reason",
   "cashier_refund_success": "Refund completed successfully",
   "cashier_refund_failed": "Refund failed. Check the details and try again.",
+  "cashier": "Cashier",
   "cashier_refund_short": "Secure purchase refund",
   "cashier_invalid_change_amount": "Enter valid amounts; the received amount must cover the purchase.",
   "cashier_change_calculator": "Change",

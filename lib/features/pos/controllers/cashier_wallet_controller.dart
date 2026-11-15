@@ -18,8 +18,37 @@ class CashierWalletController extends GetxController {
   CashierWalletsModel? _walletsData;
   CashierWalletsModel? get walletsData => _walletsData;
 
+  WalletModel? _selectedCashierWallet;
+  WalletModel? get selectedCashierWallet => _selectedCashierWallet;
+
+  void selectCashierWallet(WalletModel wallet) {
+    _selectedCashierWallet = wallet;
+    update();
+  }
+
   List<WalletModel> get cashierWallets => _walletsData?.cashierWallets ?? [];
   List<WalletModel> get merchantWallets => _walletsData?.merchantWallets ?? [];
+  List<WalletModel> get displayWallets {
+    final byCurrency = <String, WalletModel>{};
+    for (final wallet in merchantWallets) {
+      byCurrency[wallet.currencyCode] = wallet;
+    }
+    for (final wallet in cashierWallets) {
+      byCurrency[wallet.currencyCode] = wallet;
+    }
+    const order = ['YER', 'USD', 'SAR'];
+    final wallets = byCurrency.values.toList();
+    wallets.sort((a, b) {
+      final ai = order.indexOf(a.currencyCode);
+      final bi = order.indexOf(b.currencyCode);
+      final ap = ai < 0 ? order.length : ai;
+      final bp = bi < 0 ? order.length : bi;
+      return ap == bp
+          ? a.currencyCode.compareTo(b.currencyCode)
+          : ap.compareTo(bp);
+    });
+    return wallets;
+  }
 
   @override
   void onInit() {
@@ -48,6 +77,17 @@ class CashierWalletController extends GetxController {
 
       if (response.statusCode == 200 && response.body != null) {
         _walletsData = CashierWalletsModel.fromResponse(response.body);
+        final wallets = displayWallets;
+        if (wallets.isNotEmpty) {
+          final selectedCode = _selectedCashierWallet?.currencyCode;
+          _selectedCashierWallet = wallets.firstWhere(
+            (wallet) => wallet.currencyCode == selectedCode,
+            orElse: () => wallets.firstWhere(
+              (wallet) => wallet.isDefault,
+              orElse: () => wallets.first,
+            ),
+          );
+        }
         _errorMessage = null;
       } else if (response.statusCode == 403 || response.statusCode == 401) {
         _errorMessage = 'انتهت صلاحية جلسة الكاشير أو غير مصرح لك (403)';

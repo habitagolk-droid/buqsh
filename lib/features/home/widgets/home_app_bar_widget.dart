@@ -20,9 +20,10 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCashier = Get.find<CashierAuthController>().isSessionReady;
-    return GetBuilder<ProfileController>(
-      builder: (profileController) {
+    return GetBuilder<CashierAuthController>(
+      builder: (cashierController) => GetBuilder<ProfileController>(
+        builder: (profileController) {
+        final isCashier = cashierController.isSessionReady;
         return Container(
           color: Theme.of(context).primaryColor,
           child: Container(
@@ -45,38 +46,58 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 Expanded(
                   child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: () => Get.find<MenuItemController>().selectProfilePage(),
+                      Builder(
+                        builder: (avatarContext) => GestureDetector(
+                        onTap: () {
+                          if (isCashier) {
+                            Scaffold.of(avatarContext).openDrawer();
+                          } else {
+                            Get.find<MenuItemController>().selectProfilePage();
+                          }
+                        },
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           height: Dimensions.radiusSizeOverLarge,
                           width: Dimensions.radiusSizeOverLarge,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child:
-                                isCashier || profileController.userInfo == null
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.asset(
-                                        Images.avatar,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: isCashier || profileController.userInfo == null
+                                    ? Image.asset(Images.avatar, fit: BoxFit.cover)
+                                    : CustomImageWidget(
+                                        image:
+                                            '${Get.find<SplashController>().configModel!.baseUrls!.customerImageUrl}/${profileController.userInfo!.image ?? ''}',
                                         fit: BoxFit.cover,
+                                        placeholder: Images.avatar,
                                       ),
+                              ),
+                              if (isCashier)
+                                Positioned(
+                                  right: -4,
+                                  bottom: -4,
+                                  child: Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).secondaryHeaderColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 1.5),
                                     ),
-                                  )
-                                : CustomImageWidget(
-                                    image:
-                                        '${Get.find<SplashController>().configModel!.baseUrls!.customerImageUrl}/${profileController.userInfo!.image ?? ''}',
-                                    fit: BoxFit.cover,
-                                    placeholder: Images.avatar,
+                                    child: Icon(
+                                      Icons.menu_rounded,
+                                      size: 11,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
                                   ),
+                                ),
+                            ],
                           ),
                         ),
+                      ),
                       ),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
 
@@ -156,7 +177,8 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 
@@ -188,9 +210,17 @@ class _QrPopupCardWidget extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: GetBuilder<ProfileController>(
                 builder: (controller) {
+                  final qrCode = controller.userInfo?.qrCode;
+                  if (qrCode == null || qrCode.isEmpty) {
+                    return SizedBox(
+                      width: size.width * 0.65,
+                      height: size.width * 0.65,
+                      child: Image.asset(Images.qrCode, fit: BoxFit.contain),
+                    );
+                  }
                   return SizedBox(
                     child: SvgPicture.string(
-                      controller.userInfo!.qrCode!,
+                      qrCode,
                       fit: BoxFit.contain,
                       width: size.width * 0.8,
                     ),

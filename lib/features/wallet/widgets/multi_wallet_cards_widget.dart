@@ -5,6 +5,7 @@ import 'package:six_cash/features/setting/controllers/profile_screen_controller.
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
 import 'package:six_cash/helper/price_converter_helper.dart';
 import 'package:six_cash/util/color_resources.dart';
 import 'package:six_cash/util/dimensions.dart';
@@ -24,6 +25,15 @@ class MultiWalletCardsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (Get.find<CashierAuthController>().isSessionReady) {
+      if (!Get.isRegistered<CashierWalletController>()) {
+        return const SizedBox.shrink();
+      }
+      return GetBuilder<CashierWalletController>(
+        builder: (controller) => _buildCashierWalletCard(context, controller),
+      );
+    }
+
     if (!Get.isRegistered<WalletController>()) {
       return const SizedBox.shrink();
     }
@@ -467,6 +477,194 @@ class MultiWalletCardsWidget extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+
+  Widget _buildCashierWalletCard(
+    BuildContext context,
+    CashierWalletController controller,
+  ) {
+    final wallets = controller.displayWallets;
+    if (controller.isLoading && wallets.isEmpty) {
+      return Container(
+        height: 160,
+        margin: const EdgeInsets.symmetric(
+          horizontal: Dimensions.paddingSizeDefault,
+          vertical: Dimensions.paddingSizeSmall,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.radiusSizeLarge),
+        ),
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
+    }
+    if (wallets.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: Dimensions.paddingSizeDefault,
+          vertical: Dimensions.paddingSizeSmall,
+        ),
+        padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.radiusSizeLarge),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                controller.errorMessage ?? 'failed_to_fetch_wallets'.tr,
+                style: rubikRegular.copyWith(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+            IconButton(
+              onPressed: controller.fetchCashierWallets,
+              icon: const Icon(Icons.refresh_rounded),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final selected = controller.selectedCashierWallet ?? wallets.first;
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeDefault,
+        vertical: Dimensions.paddingSizeSmall,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(Dimensions.radiusSizeLarge),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'available_balance'.tr,
+                        style: rubikMedium.copyWith(
+                          color: ColorResources.getBalanceTextColor(),
+                          fontSize: Dimensions.fontSizeSmall,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          '${selected.currencySymbol} ${_formatBalance(selected.currentBalance)}',
+                          style: rubikBold.copyWith(
+                            fontSize: Dimensions.fontSizeOverLarge,
+                            color: Theme.of(context).textTheme.titleLarge?.color,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        selected.currencyName,
+                        style: rubikMedium.copyWith(
+                          fontSize: Dimensions.fontSizeSmall,
+                          color: ColorResources.getHintColor(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).secondaryHeaderColor.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    selected.currencySymbol,
+                    style: rubikBold.copyWith(
+                      fontSize: 22,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, thickness: 0.6),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Dimensions.paddingSizeSmall,
+              vertical: 8,
+            ),
+            child: Row(
+              children: wallets.map((wallet) {
+                final isSelected = wallet.currencyCode == selected.currencyCode;
+                return Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Theme.of(context).primaryColor.withOpacity(0.1)
+                          : Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSizeDefault),
+                      border: Border.all(
+                        color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+                        width: 1.2,
+                      ),
+                    ),
+                    child: CustomInkWellWidget(
+                      onTap: () => controller.selectCashierWallet(wallet),
+                      radius: Dimensions.radiusSizeDefault,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                        child: Column(
+                          children: [
+                            Text(
+                              wallet.currencyCode,
+                              style: rubikSemiBold.copyWith(
+                                fontSize: Dimensions.fontSizeDefault,
+                                color: isSelected
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).textTheme.titleMedium?.color,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _formatBalance(wallet.currentBalance),
+                                maxLines: 1,
+                                style: rubikMedium.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: isSelected
+                                      ? Theme.of(context).primaryColor
+                                      : ColorResources.getHintColor(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
