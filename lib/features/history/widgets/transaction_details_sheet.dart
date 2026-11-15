@@ -11,6 +11,11 @@ import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/images.dart';
 import 'package:six_cash/util/styles.dart';
 import 'package:six_cash/utils/receipt_image_actions.dart';
+import 'package:six_cash/utils/tafqeet_helper.dart';
+
+const Color _jaibPrimary = Color(0xFF0C4A40);
+const Color _jaibLime = Color(0xFFD4E157);
+const Color _jaibBackground = Color(0xFFF4F5F7);
 
 class TransactionDetailsSheet extends StatefulWidget {
   final Transactions? transaction;
@@ -121,7 +126,7 @@ class _TransactionDetailsSheetState extends State<TransactionDetailsSheet> {
         Dimensions.paddingSizeSmall,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(Dimensions.radiusSizeExtraLarge),
         boxShadow: [
           BoxShadow(
@@ -274,6 +279,9 @@ class _ReceiptContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final amount = (item.amount ?? 0) > 0
+        ? item.amount!
+        : ((item.debit ?? 0) > 0 ? item.debit! : (item.credit ?? 0));
     final rows = <Widget>[];
     if (refNumber.isNotEmpty) {
       rows.add(
@@ -338,7 +346,7 @@ class _ReceiptContent extends StatelessWidget {
           'transaction_details'.tr,
           style: rubikBold.copyWith(
             fontSize: Dimensions.fontSizeExtraLarge,
-            color: ColorResources.getTextColor(),
+            color: _jaibPrimary,
           ),
         ),
         const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -349,39 +357,58 @@ class _ReceiptContent extends StatelessWidget {
             vertical: Dimensions.paddingSizeSmall,
           ),
           decoration: BoxDecoration(
-            color: ColorResources.getLightGray(),
+            color: _jaibBackground,
             borderRadius: BorderRadius.circular(Dimensions.radiusSizeDefault),
+            border: Border.all(color: _jaibLime.withOpacity(0.65)),
           ),
-          child: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: rubikMedium.copyWith(
-                color: ColorResources.getTextColor(),
-                fontSize: Dimensions.fontSizeLarge,
-              ),
-              children: [
-                TextSpan(
-                  text: item.formatAmount().replaceFirst(
-                    ' ${item.displayCurrencySymbol}',
-                    '',
+          child: Column(
+            children: [
+              RichText(
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
+                text: TextSpan(
+                  style: rubikMedium.copyWith(
+                    color: ColorResources.getTextColor(),
+                    fontSize: Dimensions.fontSizeLarge,
                   ),
-                  style: rubikBold.copyWith(
-                    color: isCredit
-                        ? ColorResources.primaryColor
-                        : ColorResources.errorColor,
-                    fontSize: Dimensions.fontSizeOverLarge,
-                  ),
+                  children: [
+                    TextSpan(
+                      text: item.formatAmount().replaceFirst(
+                        ' ${item.displayCurrencySymbol}',
+                        '',
+                      ),
+                      style: rubikBold.copyWith(
+                        color: isCredit ? _jaibPrimary : ColorResources.errorColor,
+                        fontSize: Dimensions.fontSizeOverLarge,
+                      ),
+                    ),
+                    if (item.displayCurrencySymbol.isNotEmpty)
+                      TextSpan(
+                        text: ' ${item.displayCurrencySymbol}',
+                        style: rubikMedium.copyWith(
+                          color: ColorResources.getTextColor(),
+                          fontSize: Dimensions.fontSizeLarge,
+                        ),
+                      ),
+                  ],
                 ),
-                if (item.displayCurrencySymbol.isNotEmpty)
-                  TextSpan(
-                    text: ' ${item.displayCurrencySymbol}',
+              ),
+              if (amount >= 1 && amount <= 999999)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    TafqeetHelper.convert(
+                      amount,
+                      currencyCode: item.displayCurrencyCode,
+                    ),
+                    textAlign: TextAlign.center,
                     style: rubikMedium.copyWith(
-                      color: ColorResources.getTextColor(),
-                      fontSize: Dimensions.fontSizeLarge,
+                      color: _jaibPrimary,
+                      fontSize: Dimensions.fontSizeSmall,
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -419,7 +446,7 @@ class _BrandLockup extends StatelessWidget {
         Text(
           'بُقْش',
           style: rubikBold.copyWith(
-            color: ColorResources.primaryColor,
+            color: _jaibPrimary,
             fontSize: 29,
             height: 1,
           ),
@@ -484,7 +511,7 @@ class _ReferenceRow extends StatelessWidget {
                     child: Icon(
                       Icons.copy_rounded,
                       size: 19,
-                      color: ColorResources.primaryColor,
+                      color: _jaibPrimary,
                     ),
                   ),
                 ),
@@ -588,7 +615,7 @@ class _ActionsRow extends StatelessWidget {
           child: _ReceiptAction(
             icon: Icons.share_rounded,
             label: 'share'.tr,
-            iconColor: ColorResources.primaryColor,
+            iconColor: _jaibPrimary,
             onPressed: onShare,
           ),
         ),
@@ -630,7 +657,7 @@ class _ReceiptAction extends StatelessWidget {
               ),
               child: Icon(
                 icon,
-                color: iconColor ?? ColorResources.primaryColor,
+                color: iconColor ?? _jaibPrimary,
                 size: 30,
               ),
             ),
