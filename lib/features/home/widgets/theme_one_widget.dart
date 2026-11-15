@@ -24,7 +24,7 @@ class ThemeOneWidget extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 100),
               child: Column(
                 children: [
-                  if (showWalletCards) const MultiWalletCardsWidget(),
+                  if (showWalletCards) MultiWalletCardsWidget(),
 
                   // 3. البنر الأصلي "BannerWidget"
                   BannerWidget(),
