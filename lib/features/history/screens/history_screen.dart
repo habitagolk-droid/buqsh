@@ -33,42 +33,34 @@ class HistoryScreen extends StatelessWidget {
                   delegate: SliverDelegate(
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                        height: 50, alignment: Alignment.centerLeft,
-                        child: GetBuilder<TransactionHistoryController>(
-                          builder: (historyController){
-                            return ListView(
-                              shrinkWrap: true,
-                                padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall),
+                        height: 112,
+                        child: GetBuilder<TransactionHistoryController>(builder: (historyController) {
+                          return Column(children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: TextField(
+                                decoration: InputDecoration(hintText: 'بحث في العمليات', prefixIcon: const Icon(Icons.search), filled: true, fillColor: Colors.white, contentPadding: const EdgeInsets.symmetric(vertical: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(99), borderSide: BorderSide.none)),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              height: 32,
+                              child: ListView(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 scrollDirection: Axis.horizontal,
                                 children: [
-                                  TransactionTypeButtonWidget(text: 'all'.tr, index: 0, transactionHistoryList : historyController.transactionList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'send_money'.tr, index: 1, transactionHistoryList: historyController.sendMoneyList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'cash_in'.tr, index: 2, transactionHistoryList: historyController.cashInMoneyList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'add_money'.tr, index: 3, transactionHistoryList: historyController.addMoneyList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'received_money'.tr, index: 4, transactionHistoryList: historyController.receivedMoneyList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'cash_out'.tr, index: 5, transactionHistoryList: historyController.cashOutList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'withdraw'.tr, index: 6, transactionHistoryList: historyController.withdrawList),
-                                  const SizedBox(width: 10),
-
-                                  TransactionTypeButtonWidget(text: 'payment'.tr, index: 7, transactionHistoryList: historyController.paymentList),
-                                  const SizedBox(width: 10),
-
-                                ]);
-                          },
-
-                        ),
+                                  TransactionTypeButtonWidget(text: 'الكل', index: 0, transactionHistoryList: historyController.transactionList),
+                                  const SizedBox(width: 8),
+                                  TransactionTypeButtonWidget(text: 'وارد', index: 4, transactionHistoryList: historyController.receivedMoneyList),
+                                  const SizedBox(width: 8),
+                                  TransactionTypeButtonWidget(text: 'صادر', index: 1, transactionHistoryList: historyController.sendMoneyList),
+                                  const SizedBox(width: 8),
+                                  TransactionTypeButtonWidget(text: 'فواتير', index: 7, transactionHistoryList: historyController.paymentList),
+                                ],
+                              ),
+                            ),
+                          ]);
+                        }),
                       ))),
               SliverToBoxAdapter(
                 child: Scrollbar(
@@ -98,13 +90,13 @@ class SliverDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 50;
+  double get maxExtent => 112;
 
   @override
-  double get minExtent => 50;
+  double get minExtent => 112;
 
   @override
   bool shouldRebuild(SliverDelegate oldDelegate) {
-    return oldDelegate.maxExtent != 50 || oldDelegate.minExtent != 50 || child != oldDelegate.child;
+    return oldDelegate.maxExtent != 112 || oldDelegate.minExtent != 112 || child != oldDelegate.child;
   }
 }

@@ -42,6 +42,12 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
   String? _verifiedRecipientName;
   String? _recipientAvatar;
 
+  bool _validMobile(String value) =>
+      RegExp(r'^(70|71|73|77|78)\d{7}$').hasMatch(value.replaceAll(RegExp(r'\D'), ''));
+
+  bool _validAmount(double? value, double balance) =>
+      value != null && value >= 1 && value <= 999999 && value % 1 == 0 && value <= balance;
+
   @override
   void initState() {
     super.initState();
@@ -164,7 +170,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
       return;
     }
 
-    if (phone.length < 8) {
+    if (!_validMobile(phone)) {
       showCustomSnackBarHelper('please_input_your_valid_number'.tr, isError: true);
       return;
     }
@@ -172,7 +178,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
     // 3. التحقق من المبلغ
     final amountText = _amountController.text.trim();
     final amount = double.tryParse(amountText);
-    if (amount == null || amount <= 0) {
+    if (!_validAmount(amount, _selectedWallet?.currentBalance ?? 0)) {
       showCustomSnackBarHelper('enter_valid_amount'.tr, isError: true);
       return;
     }
@@ -263,6 +269,9 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
           final double? enteredAmount = double.tryParse(_amountController.text.trim());
           final bool isOverBalance =
               enteredAmount != null && enteredAmount > currentBalance;
+          final bool canContinue = _selectedWallet != null &&
+              _validMobile(_phoneController.text) &&
+              _validAmount(enteredAmount, currentBalance);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
@@ -522,6 +531,12 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                             tooltip: 'phone_book'.tr,
                             onPressed: _pickContact,
                           ),
+                          IconButton(
+                            icon: const Icon(Icons.star_outline_rounded),
+                            color: ColorResources.primaryColor,
+                            tooltip: 'favorite'.tr,
+                            onPressed: () => _setCleanPhone('777123456'),
+                          ),
                         ],
                       ),
                     ),
@@ -730,7 +745,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: _isLoadingRecipient ? null : _onContinuePressed,
+                    onPressed: _isLoadingRecipient || !canContinue ? null : _onContinuePressed,
                     child: _isLoadingRecipient
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -108,6 +108,20 @@ class _TransactionDetailsSheetState extends State<TransactionDetailsSheet> {
                 ),
                 onFavorite: _toggleFavorite,
               ),
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _jaibPrimary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('تم', style: TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ),
             ],
           ),
         ),
@@ -357,9 +371,9 @@ class _ReceiptContent extends StatelessWidget {
             vertical: Dimensions.paddingSizeSmall,
           ),
           decoration: BoxDecoration(
-            color: _jaibBackground,
-            borderRadius: BorderRadius.circular(Dimensions.radiusSizeDefault),
-            border: Border.all(color: _jaibLime.withOpacity(0.65)),
+            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_jaibSecondary, _jaibPrimaryDark]),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [BoxShadow(color: Color(0x470C4A40), blurRadius: 12, offset: Offset(0, 5))],
           ),
           child: Column(
             children: [
@@ -368,7 +382,7 @@ class _ReceiptContent extends StatelessWidget {
                 textDirection: TextDirection.ltr,
                 text: TextSpan(
                   style: rubikMedium.copyWith(
-                    color: ColorResources.getTextColor(),
+                    color: Colors.white,
                     fontSize: Dimensions.fontSizeLarge,
                   ),
                   children: [
@@ -378,7 +392,7 @@ class _ReceiptContent extends StatelessWidget {
                         '',
                       ),
                       style: rubikBold.copyWith(
-                        color: isCredit ? _jaibPrimary : ColorResources.errorColor,
+                        color: Colors.white,
                         fontSize: Dimensions.fontSizeOverLarge,
                       ),
                     ),
@@ -386,7 +400,7 @@ class _ReceiptContent extends StatelessWidget {
                       TextSpan(
                         text: ' ${item.displayCurrencySymbol}',
                         style: rubikMedium.copyWith(
-                          color: ColorResources.getTextColor(),
+                          color: Colors.white,
                           fontSize: Dimensions.fontSizeLarge,
                         ),
                       ),
@@ -403,7 +417,7 @@ class _ReceiptContent extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                     style: rubikMedium.copyWith(
-                      color: _jaibPrimary,
+                      color: _jaibLime,
                       fontSize: Dimensions.fontSizeSmall,
                     ),
                   ),

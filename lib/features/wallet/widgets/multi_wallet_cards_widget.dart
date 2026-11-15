@@ -10,6 +10,7 @@ import 'package:six_cash/helper/price_converter_helper.dart';
 import 'package:six_cash/util/color_resources.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
+import 'package:six_cash/features/wallet/widgets/jaib_wallet_carousel.dart';
 
 class MultiWalletCardsWidget extends StatelessWidget {
   const MultiWalletCardsWidget({Key? key}) : super(key: key);
@@ -123,6 +124,12 @@ class MultiWalletCardsWidget extends StatelessWidget {
             final WalletModel? selected =
                 walletController.selectedWallet ??
                 (wallets.isNotEmpty ? wallets.first : null);
+
+            return JaibWalletCarousel(
+              wallets: wallets,
+              selected: selected,
+              onSelect: walletController.selectWallet,
+            );
 
             return Container(
               margin: const EdgeInsets.symmetric(
