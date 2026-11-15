@@ -5,17 +5,14 @@ import 'package:six_cash/common/widgets/custom_dialog_widget.dart';
 import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/camera_verification/screens/camera_screen.dart';
 import 'package:six_cash/features/home/controllers/menu_controller.dart';
-import 'package:six_cash/features/home/widgets/bottom_item_widget.dart';
-import 'package:six_cash/features/home/widgets/floating_action_button_widget.dart';
+import 'package:six_cash/features/home/widgets/jaib_bottom_bar.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/screens/cashier_profile_screen.dart';
 import 'package:six_cash/features/pos/transactions/cashier_transactions_screen.dart';
 import 'package:six_cash/features/splash/screens/splash_screen.dart';
 import 'package:six_cash/helper/dialog_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
-import 'package:six_cash/util/color_resources.dart';
 import 'package:six_cash/util/dimensions.dart';
-import 'package:six_cash/util/images.dart';
 import 'package:six_cash/util/styles.dart';
 
 class NavBarScreen extends StatefulWidget {
@@ -67,105 +64,39 @@ class _NavBarScreenState extends State<NavBarScreen> {
                           ? const CashierProfileScreen()
                           : menuController.screen[menuController.currentTabIndex],
                 ),
-                floatingActionButton: FloatingActionButtonWidget(
-                  strokeWidth: 1.5,
-                  radius: 50,
-                  gradient: LinearGradient(
-                    colors: [
-                      ColorResources.gradientColor,
-                      ColorResources.gradientColor.withOpacity(0.5),
-                      ColorResources.secondaryColor.withOpacity(0.3),
-                      ColorResources.gradientColor.withOpacity(0.05),
-                      ColorResources.gradientColor.withOpacity(0),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  child: FloatingActionButton(
-                    shape: const CircleBorder(),
-                    backgroundColor: Theme.of(context).secondaryHeaderColor,
-                    elevation: 1,
-                    onPressed: () {
-                      if (isCashier) {
-                        Get.toNamed(RouteHelper.cashierPosSale);
-                      } else {
-                        Get.to(
-                          () => const CameraScreen(
-                            fromEditProfile: false,
-                            isBarCodeScan: true,
-                            isHome: true,
-                          ),
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                      child: Image.asset(Images.scannerIcon),
-                    ),
-                  ),
+                floatingActionButton: JaibFab(
+                  onTap: () {
+                    if (isCashier) {
+                      Get.toNamed(RouteHelper.cashierPosSale);
+                    } else {
+                      Get.to(
+                        () => const CameraScreen(
+                          fromEditProfile: false,
+                          isBarCodeScan: true,
+                          isHome: true,
+                        ),
+                      );
+                    }
+                  },
                 ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
                 bottomNavigationBar: SafeArea(
                   top: false,
-                  child: BottomAppBar(
-                    color: Theme.of(context)
-                        .bottomNavigationBarTheme.backgroundColor,
-                    elevation: 8,
-                    shadowColor:
-                        ColorResources.getBlackAndWhite().withOpacity(0.18),
-                    surfaceTintColor: Colors.transparent,
-                    shape: const CircularNotchedRectangle(),
-                    notchMargin: 8,
-                    padding: EdgeInsets.zero,
-                    child: SizedBox(
-                      height: 70,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: BottomItemWidget(
-                              onTop: menuController.selectHomePage,
-                              icon: menuController.currentTabIndex == 0
-                                  ? Images.homeIconBold
-                                  : Images.homeIcon,
-                              name: 'home'.tr,
-                              selectIndex: 0,
-                            ),
-                          ),
-                          Expanded(
-                            child: BottomItemWidget(
-                              onTop: menuController.selectNotificationPage,
-                              icon: menuController.currentTabIndex == 2
-                                  ? Images.notificationIconBold
-                                  : Images.notificationIcon,
-                              name: 'notification'.tr,
-                              selectIndex: 2,
-                            ),
-                          ),
-                          const SizedBox(width: 72),
-                          Expanded(
-                            child: BottomItemWidget(
-                              onTop: menuController.selectHistoryPage,
-                              icon: menuController.currentTabIndex == 1
-                                  ? Images.clockIconBold
-                                  : Images.clockIcon,
-                              name: 'history'.tr,
-                              selectIndex: 1,
-                            ),
-                          ),
-                          Expanded(
-                            child: BottomItemWidget(
-                              onTop: menuController.selectProfilePage,
-                              icon: menuController.currentTabIndex == 3
-                                  ? Images.profileIconBold
-                                  : Images.profileIcon,
-                              name: 'profile'.tr,
-                              selectIndex: 3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  child: JaibBottomBar(
+                    index: menuController.currentTabIndex,
+                    onTap: (index) {
+                      switch (index) {
+                        case 0:
+                          menuController.selectHomePage();
+                        case 1:
+                          menuController.selectHistoryPage();
+                        case 2:
+                          menuController.selectNotificationPage();
+                        case 3:
+                          menuController.selectProfilePage();
+                      }
+                    },
                   ),
                 ),
               );
