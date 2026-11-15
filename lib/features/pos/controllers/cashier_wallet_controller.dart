@@ -29,15 +29,10 @@ class CashierWalletController extends GetxController {
   List<WalletModel> get cashierWallets => _walletsData?.cashierWallets ?? [];
   List<WalletModel> get merchantWallets => _walletsData?.merchantWallets ?? [];
   List<WalletModel> get displayWallets {
-    final byCurrency = <String, WalletModel>{};
-    for (final wallet in merchantWallets) {
-      byCurrency[wallet.currencyCode] = wallet;
-    }
-    for (final wallet in cashierWallets) {
-      byCurrency[wallet.currencyCode] = wallet;
-    }
+    // لا تعرض رصيد التاجر على أنه رصيد الكاشير. هذه الشاشة خاصة بحساب
+    // الكاشير، لذا لا نستخدم محافظ التاجر كبديل للعملات المفقودة.
+    final wallets = List<WalletModel>.of(cashierWallets);
     const order = ['YER', 'USD', 'SAR'];
-    final wallets = byCurrency.values.toList();
     wallets.sort((a, b) {
       final ai = order.indexOf(a.currencyCode);
       final bi = order.indexOf(b.currencyCode);

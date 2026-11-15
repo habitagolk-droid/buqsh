@@ -9,17 +9,12 @@ import 'package:six_cash/common/widgets/custom_image_widget.dart';
 import 'package:six_cash/features/add_money/screens/web_screen.dart';
 import 'package:six_cash/features/home/widgets/banner_shimmer_widget.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 
 class BannerWidget extends StatelessWidget {
   const BannerWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (Get.find<CashierAuthController>().isSessionReady) {
-      return const SizedBox.shrink();
-    }
-
     final Size size = MediaQuery.of(context).size;
     return GetBuilder<SplashController>(
       builder: (splashController) {

@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (Get.find<CashierAuthController>().isSessionReady) {
+      await Get.find<BannerController>().getBannerList(reload);
       if (reload && Get.isRegistered<CashierWalletController>()) {
         await Get.find<CashierWalletController>().fetchCashierWallets(
           showLoading: true,
