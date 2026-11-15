@@ -141,7 +141,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                   setState(() => _walletIndex = index);
                   controller.selectWallet(wallets[index]);
                 },
-                itemBuilder: (context, index) => _buildWalletCard(wallets[index]),
+                itemBuilder: (context, index) => _buildWalletCard(wallets[index], index),
               ),
             ),
             const SizedBox(height: 8),
@@ -167,18 +167,29 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     );
   }
 
-  Widget _buildWalletCard(WalletModel wallet) {
+  Widget _buildWalletCard(WalletModel wallet, int index) {
     final balance = wallet.currentBalance
         .toStringAsFixed(2)
         .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+    final isLightCard = index == 2 || wallet.currencyCode.toUpperCase() == 'USD';
+    final foreground = isLightCard ? _dark : Colors.white;
+    final accent = index == 1 ? const Color(0xFFD4E157) : (isLightCard ? _primary : Colors.white);
+    final gradient = index == 1
+        ? const [Color(0xFF1E1E1E), _dark]
+        : isLightCard
+            ? const [Colors.white, Color(0xFFE8F5E9)]
+            : const [_primary, _dark];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Container(
         width: 320,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
-          border: Border.all(color: _primary.withOpacity(.10)),
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: gradient,
+          ),
           boxShadow: const [
             BoxShadow(color: Color(0x180A3A2A), blurRadius: 12, offset: Offset(0, 5)),
           ],
@@ -190,21 +201,26 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('حساب', style: rubikRegular.copyWith(color: Colors.black54, fontSize: 14)),
-                Text(wallet.currencyName, style: rubikBold.copyWith(color: _dark, fontSize: 18)),
+                Text('المحفظة', style: rubikRegular.copyWith(color: foreground.withOpacity(.70), fontSize: 14)),
+                Text(
+                  wallet.isDefault ? 'المحفظة الافتراضية' : wallet.currencyName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: rubikBold.copyWith(color: foreground, fontSize: 16),
+                ),
               ],
             ),
             const Spacer(),
             Text(
               _hideBalances ? '••••••••' : '$balance ${wallet.currencySymbol}',
               textAlign: TextAlign.right,
-              style: rubikBold.copyWith(color: _dark, fontSize: 24),
+              style: rubikBold.copyWith(color: foreground, fontSize: 24),
             ),
             const SizedBox(height: 2),
             Text(
               wallet.currencyCode,
               textAlign: TextAlign.right,
-              style: rubikRegular.copyWith(color: Colors.black45, fontSize: 12),
+              style: rubikRegular.copyWith(color: foreground.withOpacity(.70), fontSize: 12),
             ),
             const Spacer(),
             Row(
@@ -217,7 +233,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                   icon: Icon(
                     _hideBalances ? Icons.visibility_rounded : Icons.visibility_off_rounded,
                     size: 24,
-                    color: Colors.white,
+                    color: accent,
                   ),
                 ),
                 Row(
@@ -227,7 +243,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                       width: 8,
                       height: 8,
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
                     ),
                   ),
                 ),
@@ -274,6 +290,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
       builder: (splashController) {
         final bannerEnabled =
             splashController.configModel?.systemFeature?.bannerStatus ?? false;
+        if (bannerEnabled) return const BannerWidget();
         return Container(
           height: 120,
           margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -283,9 +300,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: _primary.withOpacity(.12)),
           ),
-          child: bannerEnabled
-              ? const BannerWidget()
-              : Stack(
+          child: Stack(
                   alignment: Alignment.center,
                   children: [
                     Icon(Icons.image_outlined, size: 34, color: _primary.withOpacity(.65)),
@@ -305,7 +320,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                       ),
                     ),
                   ],
-                ),
+          ),
         );
       },
     );

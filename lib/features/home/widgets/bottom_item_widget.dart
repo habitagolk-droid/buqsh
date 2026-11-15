@@ -32,7 +32,7 @@ class BottomItemWidget extends StatelessWidget {
 
           return SizedBox(
             width: double.infinity,
-            height: 60,
+            height: 70,
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -56,7 +56,7 @@ class BottomItemWidget extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: rubikSemiBold.copyWith(
                         color: isSelected ? activeColor : inactiveColor,
-                        fontSize: Dimensions.fontSizeSmall,
+                        fontSize: 10,
                       ),
                     ),
                   ),

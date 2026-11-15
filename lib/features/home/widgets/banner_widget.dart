@@ -15,7 +15,6 @@ class BannerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     return GetBuilder<SplashController>(
       builder: (splashController) {
         return (splashController.configModel?.systemFeature?.bannerStatus ??
@@ -26,13 +25,19 @@ class BannerWidget extends StatelessWidget {
                       ? const Center(child: BannerShimmerWidget())
                       : bannerController.bannerList!.isNotEmpty
                       ? Container(
+                          height: 120,
                           margin: const EdgeInsets.symmetric(
-                            vertical: Dimensions.paddingSizeLarge,
+                            horizontal: Dimensions.paddingSizeDefault,
+                            vertical: Dimensions.paddingSizeSmall,
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: Stack(
                             children: [
                               SizedBox(
-                                height: size.width / 3.5,
+                                height: 120,
                                 width: size.width,
                                 child: CarouselSlider.builder(
                                   itemCount:
@@ -59,11 +64,8 @@ class BannerWidget extends StatelessWidget {
                                         }
                                       },
 
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal:
-                                              Dimensions.paddingSizeDefault,
-                                        ),
+                                    child: Padding(
+                                        padding: EdgeInsets.zero,
                                         child: Container(
                                           width: MediaQuery.of(
                                             context,

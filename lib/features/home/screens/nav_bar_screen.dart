@@ -115,18 +115,11 @@ class _NavBarScreenState extends State<NavBarScreen> {
                     shadowColor:
                         ColorResources.getBlackAndWhite().withOpacity(0.18),
                     surfaceTintColor: Colors.transparent,
-                    shape: AutomaticNotchedShape(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(20),
-                        ),
-                      ),
-                      const CircleBorder(),
-                    ),
+                    shape: const CircularNotchedRectangle(),
                     notchMargin: 8,
                     padding: EdgeInsets.zero,
                     child: SizedBox(
-                      height: 60,
+                      height: 70,
                       child: Row(
                         children: [
                           Expanded(

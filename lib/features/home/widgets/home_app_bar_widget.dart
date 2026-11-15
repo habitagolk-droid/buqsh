@@ -217,10 +217,13 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
-    return Container(
-      color: const Color(0xFF0C4A40),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      child: Row(
+    return SafeArea(
+      top: true,
+      bottom: false,
+      child: Container(
+        color: const Color(0xFF0C4A40),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
         textDirection: TextDirection.rtl,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -281,7 +284,8 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             icon: Icons.notifications_none_rounded,
             onTap: () => Get.find<MenuItemController>().selectNotificationPage(),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
