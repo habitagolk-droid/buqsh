@@ -102,7 +102,7 @@ class JaibFab extends StatelessWidget {
       height: 64,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: phosphor, width: 3),
+        border: Border.all(color: JaibBottomBar.phosphor, width: 3),
         boxShadow: [
           BoxShadow(
             color: JaibBottomBar.phosphor.withOpacity(.75),

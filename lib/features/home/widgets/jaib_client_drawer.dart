@@ -183,6 +183,7 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
   }
 
   Widget _item(IconData icon, String title, VoidCallback onTap, {String? badge, bool? toggle, bool danger = false, bool progress = false, Widget? trailing}) {
+    final Widget? itemTrailing = trailing ?? _buildTrailing(toggle, badge, onTap);
     return ListTile(
       dense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -190,8 +191,31 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
       leading: Icon(icon, color: danger ? const Color(0xFFB3261E) : _primary, size: 19),
       title: Text(title, style: TextStyle(color: danger ? const Color(0xFFB3261E) : _darkText, fontSize: 13, fontWeight: FontWeight.w700)),
       subtitle: progress ? ClipRRect(borderRadius: BorderRadius.circular(99), child: const LinearProgressIndicator(value: .64, minHeight: 5, backgroundColor: Color(0xFFE7ECEA), valueColor: AlwaysStoppedAnimation(_secondary))) : null,
-      trailing: trailing ?? (toggle != null ? Switch(value: toggle, onChanged: (_) => onTap(), activeColor: _primary) : badge == null ? const Icon(Icons.chevron_left_rounded, color: _grey, size: 18) : Container(width: 22, height: 22, alignment: Alignment.center, decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle), child: Text(badge, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800))),
+      trailing: itemTrailing,
     );
+  }
+
+  Widget? _buildTrailing(bool? toggle, String? badge, VoidCallback onTap) {
+    if (toggle != null) {
+      return Switch(
+        value: toggle,
+        onChanged: (_) => onTap(),
+        activeColor: _primary,
+      );
+    }
+    if (badge != null) {
+      return Container(
+        width: 22,
+        height: 22,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle),
+        child: Text(
+          badge,
+          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+        ),
+      );
+    }
+    return const Icon(Icons.chevron_left_rounded, color: _grey, size: 18);
   }
 
   void _showQr() {

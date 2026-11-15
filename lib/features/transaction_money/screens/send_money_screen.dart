@@ -185,7 +185,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
 
     // التحقق من الرصيد الكافي
     final balance = _selectedWallet?.currentBalance ?? 0.0;
-    if (amount > balance) {
+    if (amount! > balance) {
       showCustomSnackBarHelper('insufficient_balance'.tr, isError: true);
       return;
     }
@@ -247,7 +247,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
         recipientPhone: fullPhone,
         recipientName: resolvedName,
         recipientAvatar: _recipientAvatar,
-        amount: amount,
+        amount: amount!,
         note: _notesController.text.trim(),
       ),
     );

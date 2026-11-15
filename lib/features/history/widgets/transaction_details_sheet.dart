@@ -14,6 +14,8 @@ import 'package:six_cash/utils/receipt_image_actions.dart';
 import 'package:six_cash/utils/tafqeet_helper.dart';
 
 const Color _jaibPrimary = Color(0xFF0C4A40);
+const Color _jaibSecondary = Color(0xFF278D5B);
+const Color _jaibPrimaryDark = Color(0xFF08332D);
 const Color _jaibLime = Color(0xFFD4E157);
 const Color _jaibBackground = Color(0xFFF4F5F7);
 
