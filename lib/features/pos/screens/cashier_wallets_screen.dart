@@ -26,17 +26,14 @@ class CashierWalletsScreen extends StatelessWidget {
             tooltip: 'retry'.tr,
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => Get.find<CashierWalletController>()
-                .fetchCashierWallets(forceRefresh: true),
+                .fetchCashierWallets(),
           ),
         ],
       ),
       body: GetBuilder<CashierWalletController>(
         builder: (controller) => RefreshIndicator(
           color: Theme.of(context).primaryColor,
-          onRefresh: () => controller.fetchCashierWallets(
-            showLoading: false,
-            forceRefresh: true,
-          ),
+          onRefresh: () => controller.fetchCashierWallets(showLoading: false),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.only(

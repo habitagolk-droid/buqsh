@@ -26,8 +26,10 @@ class MultiWalletCardsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (Get.find<CashierAuthController>().isSessionReady) {
+      if (!Get.isRegistered<CashierWalletController>()) {
+        return const SizedBox.shrink();
+      }
       return GetBuilder<CashierWalletController>(
-        init: Get.find<CashierWalletController>(),
         builder: (controller) => _buildCashierWalletCard(context, controller),
       );
     }

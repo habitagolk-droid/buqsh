@@ -1,7 +1,6 @@
 class CashierTransaction {
   const CashierTransaction({
     required this.id,
-    required this.transactionId,
     required this.amount,
     required this.currencyCode,
     required this.transactionType,
@@ -11,7 +10,6 @@ class CashierTransaction {
   });
 
   final String id;
-  final String transactionId;
   final double amount;
   final String currencyCode;
   final String transactionType;
@@ -22,7 +20,6 @@ class CashierTransaction {
   factory CashierTransaction.fromJson(Map<String, dynamic> json) {
     return CashierTransaction(
       id: json['id']?.toString() ?? '',
-      transactionId: json['transaction_id']?.toString() ?? '',
       amount: double.tryParse(json['amount']?.toString() ?? '') ?? 0,
       currencyCode: json['currency_code']?.toString() ?? '',
       transactionType: json['transaction_type']?.toString() ?? '',

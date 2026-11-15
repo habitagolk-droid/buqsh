@@ -78,7 +78,6 @@ class _CashierHomeScreenState extends State<CashierHomeScreen> {
             if (Get.isRegistered<CashierWalletController>()) {
               await Get.find<CashierWalletController>().fetchCashierWallets(
                 showLoading: false,
-                forceRefresh: true,
               );
             }
           },

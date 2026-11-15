@@ -32,13 +32,12 @@ class CashierTransactionsController extends GetxController {
     try {
       final response = await authRepo.getCashierTransactions();
       if (response.statusCode == 200) {
-        dynamic rawTransactions = response.body;
-        for (var depth = 0; depth < 3 && rawTransactions is Map; depth++) {
-          rawTransactions = rawTransactions['transactions'] ??
-              rawTransactions['data'] ??
-              rawTransactions['items'] ??
-              rawTransactions['results'];
-        }
+        final dynamic body = response.body;
+        final dynamic rawTransactions = body is List
+            ? body
+            : body is Map
+                ? (body['transactions'] ?? body['data'] ?? body['items'])
+                : null;
         if (rawTransactions is! List) {
           _transactions = const [];
           _errorMessage = 'تعذر قراءة قائمة حركات الكاشير من الخادم.';

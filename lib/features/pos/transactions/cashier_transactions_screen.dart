@@ -39,17 +39,6 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
 
   String _typeLabel(String value) {
     if (value.trim().isEmpty) return 'عملية';
-    const arabicLabels = {
-      'sale': 'بيع',
-      'refund': 'استرجاع',
-      'deposit': 'إيداع',
-      'withdrawal': 'سحب',
-      'cash_in': 'إيداع نقدي',
-      'cash_out': 'سحب نقدي',
-    };
-    if (arabicLabels.containsKey(value.toLowerCase())) {
-      return arabicLabels[value.toLowerCase()]!;
-    }
     final words = value.replaceAll('_', ' ').replaceAll('-', ' ').trim();
     return words[0].toUpperCase() + words.substring(1);
   }
@@ -86,12 +75,7 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
               _detailRow('المبلغ', _amount(transaction)),
               _detailRow('الحالة', transaction.status),
               _detailRow('التاريخ', _date(transaction.createdAt)),
-              _detailRow(
-                'رقم الحركة',
-                transaction.transactionId.isNotEmpty
-                    ? transaction.transactionId
-                    : transaction.id,
-              ),
+              _detailRow('رقم الحركة', transaction.id),
               _detailRow('رقم الإيصال', transaction.receiptNumber),
             ],
           ),
@@ -187,7 +171,7 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
                     hasScrollBody: false,
                     child: _messageState(
                       icon: Icons.receipt_long_outlined,
-                      message: 'no_previous_transactions'.tr,
+                      message: 'لا توجد حركات لعرضها',
                     ),
                   )
                 else
@@ -272,9 +256,9 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
                         maxLines: 1, overflow: TextOverflow.ellipsis, style: rubikBold),
                     const SizedBox(height: 4),
                     Text(
-                      transaction.receiptNumber.isNotEmpty
-                          ? 'الإيصال: ${transaction.receiptNumber}'
-                          : 'رقم الحركة: ${transaction.transactionId.isNotEmpty ? transaction.transactionId : transaction.id}',
+                      transaction.receiptNumber.isEmpty
+                          ? 'رقم الحركة: ${transaction.id}'
+                          : 'الإيصال: ${transaction.receiptNumber}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: rubikRegular.copyWith(fontSize: 12, color: Colors.black54),
