@@ -18,6 +18,7 @@ import 'package:six_cash/features/home/widgets/theme_one_widget.dart';
 import 'package:six_cash/features/home/widgets/linked_website_widget.dart';
 import 'package:six_cash/features/home/widgets/theme_two_widget.dart';
 import 'package:six_cash/features/home/widgets/theme_three_widget.dart';
+import 'package:six_cash/features/home/widgets/client_home_dashboard_widget.dart';
 import 'package:six_cash/features/wallet/widgets/multi_wallet_cards_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
@@ -97,8 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashController.configModel!.themeIndex ?? 1;
                     return Column(
                       children: [
-                        isCashier || themeIndex == 1
-                            ? ThemeOneWidget(showWalletCards: !isCashier)
+                        isCashier
+                            ? ThemeOneWidget(showWalletCards: false)
+                            : themeIndex == 1
+                            ? const ClientHomeDashboardWidget()
                             : themeIndex == 2
                             ? const ThemeTwoWidget()
                             : themeIndex == 3

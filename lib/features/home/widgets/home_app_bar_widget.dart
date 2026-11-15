@@ -24,6 +24,9 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       builder: (cashierController) => GetBuilder<ProfileController>(
         builder: (profileController) {
         final isCashier = cashierController.isSessionReady;
+        if (!isCashier) {
+          return _buildClientHeader(context, profileController);
+        }
         return Container(
           color: Theme.of(context).primaryColor,
           child: Container(
@@ -182,8 +185,87 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  Widget _buildClientHeader(
+    BuildContext context,
+    ProfileController profileController,
+  ) {
+    final firstName = profileController.userInfo?.fName?.trim() ?? '';
+    final lastName = profileController.userInfo?.lName?.trim() ?? '';
+    final name = '$firstName $lastName'.trim();
+
+    Widget actionButton({required IconData icon, required VoidCallback onTap}) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1F000000),
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(icon, size: 24, color: const Color(0xFF278D5B)),
+        ),
+      );
+    }
+
+    return Container(
+      color: const Color(0xFFF4F5F7),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'مساء الخير',
+                  style: rubikBold.copyWith(
+                    fontSize: 22,
+                    color: const Color(0xFF0A3A2A),
+                  ),
+                ),
+                Text(
+                  name.isEmpty ? 'عميل بقش' : name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: rubikRegular.copyWith(
+                    fontSize: 14,
+                    color: const Color(0xFF9E9E9E),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          actionButton(
+            icon: Icons.support_agent_rounded,
+            onTap: () => Get.toNamed(RouteHelper.support),
+          ),
+          const SizedBox(width: 8),
+          actionButton(
+            icon: Icons.notifications_none_rounded,
+            onTap: () => Get.find<MenuItemController>().selectNotificationPage(),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
-  Size get preferredSize => const Size(double.maxFinite, 200);
+  Size get preferredSize => Size(
+        double.maxFinite,
+        Get.find<CashierAuthController>().isSessionReady ? 200 : 104,
+      );
 }
 
 class _QrPopupCardWidget extends StatelessWidget {
