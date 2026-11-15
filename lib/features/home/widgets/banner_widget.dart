@@ -38,7 +38,7 @@ class BannerWidget extends StatelessWidget {
                             children: [
                               SizedBox(
                                 height: 120,
-                                width: size.width,
+                                          width: double.infinity,
                                 child: CarouselSlider.builder(
                                   itemCount:
                                       bannerController.bannerList!.length,

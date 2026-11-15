@@ -7,6 +7,7 @@ import 'package:six_cash/features/home/widgets/services_grid_widget.dart';
 import 'package:six_cash/features/home/widgets/banner_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
+import 'package:six_cash/features/splash/controllers/splash_controller.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/styles.dart';
