@@ -11,6 +11,7 @@ import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
+import 'package:six_cash/features/home/widgets/layered_service_icon.dart';
 
 class _ServiceItem {
   final String key;
@@ -383,42 +384,21 @@ class ServicesGridWidget extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _colorIconCircleBg,
-                              ),
-                              child: Stack(
-                                      alignment: Alignment.center,
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Icon(
-                                          service.icon,
-                                          size: 28,
-                                          color: _colorSecondary,
-                                        ),
-                                        if (_hasAccentDetail(service.icon))
-                                          Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child: Container(
-                                              width: 7,
-                                              height: 7,
-                                              decoration: BoxDecoration(
-                                                color: _colorAccent,
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: _colorIconCircleBg,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
+                            isCashier
+                                ? Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: _colorIconCircleBg,
                                     ),
-                            ),
+                                    child: Icon(
+                                      service.icon,
+                                      size: 28,
+                                      color: _colorSecondary,
+                                    ),
+                                  )
+                                : LayeredServiceIcon(kind: index, small: true),
                             const SizedBox(height: 8),
                             Text(
                               service.key.tr,
