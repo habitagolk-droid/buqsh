@@ -8,6 +8,7 @@ import 'package:six_cash/features/home/controllers/menu_controller.dart';
 import 'package:six_cash/features/home/widgets/bottom_item_widget.dart';
 import 'package:six_cash/features/home/widgets/floating_action_button_widget.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/screens/cashier_profile_screen.dart';
 import 'package:six_cash/features/splash/screens/splash_screen.dart';
 import 'package:six_cash/helper/dialog_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
@@ -59,7 +60,9 @@ class _NavBarScreenState extends State<NavBarScreen> {
                 drawer: isCashier ? _buildCashierDrawer(context) : null,
                 body: PageStorage(
                   bucket: bucket,
-                  child: menuController.screen[menuController.currentTabIndex],
+                  child: isCashier && menuController.currentTabIndex == 3
+                      ? const CashierProfileScreen()
+                      : menuController.screen[menuController.currentTabIndex],
                 ),
                 floatingActionButton: FloatingActionButtonWidget(
                   strokeWidth: 1.5,
