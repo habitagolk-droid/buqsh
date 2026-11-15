@@ -6,6 +6,7 @@ import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/camera_verification/screens/camera_screen.dart';
 import 'package:six_cash/features/home/controllers/menu_controller.dart';
 import 'package:six_cash/features/home/widgets/jaib_bottom_bar.dart';
+import 'package:six_cash/features/home/widgets/jaib_client_drawer.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/screens/cashier_profile_screen.dart';
 import 'package:six_cash/features/pos/transactions/cashier_transactions_screen.dart';
@@ -55,7 +56,9 @@ class _NavBarScreenState extends State<NavBarScreen> {
               return Scaffold(
                 backgroundColor: Theme.of(context)
                     .bottomNavigationBarTheme.selectedItemColor,
-                drawer: isCashier ? _buildCashierDrawer(context) : null,
+                drawer: isCashier
+                    ? _buildCashierDrawer(context)
+                    : const JaibClientDrawer(),
                 body: PageStorage(
                   bucket: bucket,
                   child: isCashier && menuController.currentTabIndex == 1

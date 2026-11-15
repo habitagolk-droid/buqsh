@@ -284,6 +284,13 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             icon: Icons.notifications_none_rounded,
             onTap: () => Get.find<MenuItemController>().selectNotificationPage(),
           ),
+          const SizedBox(width: 8),
+          Builder(
+            builder: (drawerContext) => actionButton(
+              icon: Icons.menu_rounded,
+              onTap: () => Scaffold.of(drawerContext).openDrawer(),
+            ),
+          ),
           ],
         ),
       ),

@@ -98,10 +98,11 @@ class JaibFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 56,
-      height: 56,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        border: Border.all(color: phosphor, width: 3),
         boxShadow: [
           BoxShadow(
             color: JaibBottomBar.phosphor.withOpacity(.75),
@@ -117,8 +118,8 @@ class JaibFab extends StatelessWidget {
       ),
       child: FloatingActionButton(
         onPressed: onTap,
-        backgroundColor: JaibBottomBar.phosphor,
-        foregroundColor: JaibBottomBar.primary,
+        backgroundColor: JaibBottomBar.primary,
+        foregroundColor: Colors.white,
         elevation: 0,
         shape: const CircleBorder(),
         child: const Icon(Icons.qr_code_scanner_rounded, size: 26),
