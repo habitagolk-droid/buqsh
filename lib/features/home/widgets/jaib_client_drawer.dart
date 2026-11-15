@@ -220,7 +220,30 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
 
   void _showQr() {
     Get.back();
-    Get.dialog(Dialog(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)), child: Padding(padding: const EdgeInsets.all(22), child: Column(mainAxisSize: MainAxisSize.min, children: [const Text('رمز QR الخاص بي', style: TextStyle(color: _primary, fontSize: 17, fontWeight: FontWeight.w800)), const SizedBox(height: 14), Image.asset(Images.qrCode, width: 220, height: 220), const SizedBox(height: 8), const Text('مشاركة الرمز لاستقبال الأموال', style: TextStyle(color: _grey, fontSize: 12))])));
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'رمز QR الخاص بي',
+                style: TextStyle(color: _primary, fontSize: 17, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 14),
+              Image.asset(Images.qrCode, width: 220, height: 220),
+              const SizedBox(height: 8),
+              const Text(
+                'مشاركة الرمز لاستقبال الأموال',
+                style: TextStyle(color: _grey, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _confirmAccountAction() {
