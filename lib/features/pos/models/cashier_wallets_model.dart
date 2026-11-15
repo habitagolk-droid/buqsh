@@ -14,9 +14,7 @@ class CashierWalletsModel {
     final rawCashier = json['cashier_wallets'] ??
         json['cashier_wallet'] ??
         json['cashierWallets'] ??
-        json['cashierWallet'] ??
-        json['wallets'] ??
-        json['wallet'];
+        json['cashierWallet'];
 
     List<WalletModel> cashierList = [];
     if (rawCashier is List) {
@@ -54,28 +52,15 @@ class CashierWalletsModel {
   }
 
   factory CashierWalletsModel.fromResponse(dynamic body) {
-    if (body is List) {
-      return CashierWalletsModel(
-        cashierWallets: body
-            .whereType<Map>()
-            .map((item) => WalletModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList(),
-        merchantWallets: const [],
-      );
-    }
     if (body is Map<String, dynamic>) {
-      if (body.containsKey('cashier_wallets') ||
-          body.containsKey('cashier_wallet') ||
-          body.containsKey('cashierWallets') ||
-          body.containsKey('cashierWallet') ||
-          body.containsKey('wallets') ||
-          body.containsKey('wallet') ||
-          body.containsKey('merchant_wallets')) {
+      if (body.containsKey('cashier_wallets') || body.containsKey('merchant_wallets')) {
         return CashierWalletsModel.fromJson(body);
       }
-      final wrapped = body['content'] ?? body['data'];
-      if (wrapped is Map || wrapped is List) {
-        return CashierWalletsModel.fromResponse(wrapped);
+      if (body['content'] is Map<String, dynamic>) {
+        return CashierWalletsModel.fromJson(body['content'] as Map<String, dynamic>);
+      }
+      if (body['data'] is Map<String, dynamic>) {
+        return CashierWalletsModel.fromJson(body['data'] as Map<String, dynamic>);
       }
       return CashierWalletsModel.fromJson(body);
     }

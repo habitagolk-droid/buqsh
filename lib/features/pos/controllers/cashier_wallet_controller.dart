@@ -19,9 +19,6 @@ class CashierWalletController extends GetxController {
   CashierWalletsModel? _walletsData;
   CashierWalletsModel? get walletsData => _walletsData;
 
-  double? _sessionBalanceFallback;
-  String _sessionCurrencyFallback = 'YER';
-
   WalletModel? _selectedCashierWallet;
   WalletModel? get selectedCashierWallet => _selectedCashierWallet;
 
@@ -30,36 +27,12 @@ class CashierWalletController extends GetxController {
     update();
   }
 
-  void setSessionBalanceFallback({
-    required double? balance,
-    required String? currencyCode,
-  }) {
-    _sessionBalanceFallback = balance;
-    final normalizedCode = currencyCode?.trim().toUpperCase() ?? 'YER';
-    _sessionCurrencyFallback = const {'YER', 'SAR', 'USD'}.contains(normalizedCode)
-        ? normalizedCode
-        : 'YER';
-    if (_walletsData != null && balance != null) {
-      final fallbackWallet = displayWallets.firstWhere(
-        (wallet) => wallet.currencyCode == _sessionCurrencyFallback,
-      );
-      if (_selectedCashierWallet == null ||
-          (_selectedCashierWallet!.id == 0 &&
-              _selectedCashierWallet!.currencyCode == _sessionCurrencyFallback)) {
-        _selectedCashierWallet = fallbackWallet;
-      }
-    }
-    update();
-  }
-
   List<WalletModel> get cashierWallets => _walletsData?.cashierWallets ?? [];
   List<WalletModel> get merchantWallets => _walletsData?.merchantWallets ?? [];
   List<WalletModel> get displayWallets {
     // لا تعرض رصيد التاجر على أنه رصيد الكاشير. هذه الشاشة خاصة بحساب
     // الكاشير، لذا لا نستخدم محافظ التاجر كبديل للعملات المفقودة.
-    if (_walletsData == null && _sessionBalanceFallback == null) {
-      return const [];
-    }
+    if (_walletsData == null) return const [];
     final byCurrency = {
       for (final wallet in cashierWallets) wallet.currencyCode: wallet,
     };
@@ -76,12 +49,8 @@ class CashierWalletController extends GetxController {
           currencyCode: entry.key,
           currencySymbol: entry.value.$1,
           currencyName: entry.value.$2,
-          currentBalance: entry.key == _sessionCurrencyFallback
-              ? (_sessionBalanceFallback ?? 0)
-              : 0,
-          baseEquivalent: entry.key == _sessionCurrencyFallback
-              ? (_sessionBalanceFallback ?? 0)
-              : 0,
+          currentBalance: 0,
+          baseEquivalent: 0,
           isDefault: false,
           pendingBalance: 0,
         ),

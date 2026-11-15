@@ -235,20 +235,11 @@ class _NavBarScreenState extends State<NavBarScreen> {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'cashier'.tr,
+                    '${info?.cashierCode ?? ''}${info?.branchName == null ? '' : ' • ${info!.branchName}'}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: rubikRegular.copyWith(color: Colors.white70, fontSize: Dimensions.fontSizeSmall),
                   ),
-                  if (info?.cashierCode?.isNotEmpty == true) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      '${'cashier_code'.tr}: ${info!.cashierCode}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: rubikRegular.copyWith(color: Colors.white70, fontSize: Dimensions.fontSizeExtraSmall),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -271,6 +262,11 @@ class _NavBarScreenState extends State<NavBarScreen> {
                     icon: Icons.history_rounded,
                     title: 'history'.tr,
                     onTap: () { Navigator.pop(context); menu.selectHistoryPage(); },
+                  ),
+                  item(
+                    icon: Icons.notifications_rounded,
+                    title: 'notification'.tr,
+                    onTap: () { Navigator.pop(context); menu.selectNotificationPage(); },
                   ),
                   item(
                     icon: Icons.person_rounded,
