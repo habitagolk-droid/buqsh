@@ -229,10 +229,21 @@ class _NavBarScreenState extends State<NavBarScreen> {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '${info?.cashierCode ?? ''}${info?.branchName == null ? '' : ' • ${info!.branchName}'}',
+                    'كاشير',
+                    style: rubikMedium.copyWith(
+                      color: Colors.white,
+                      fontSize: Dimensions.fontSizeSmall,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    [
+                      if (info?.cashierCode?.isNotEmpty == true) info!.cashierCode!,
+                      if (info?.branchName?.isNotEmpty == true) info!.branchName!,
+                    ].join(' • '),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: rubikRegular.copyWith(color: Colors.white70, fontSize: Dimensions.fontSizeSmall),
+                    style: rubikRegular.copyWith(color: Colors.white70, fontSize: Dimensions.fontSizeExtraSmall),
                   ),
                 ],
               ),

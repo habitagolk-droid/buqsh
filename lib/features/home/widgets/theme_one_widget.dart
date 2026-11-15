@@ -6,7 +6,9 @@ import 'package:six_cash/features/splash/controllers/splash_controller.dart';
 import 'package:six_cash/features/wallet/widgets/multi_wallet_cards_widget.dart';
 
 class ThemeOneWidget extends StatelessWidget {
-  const ThemeOneWidget({Key? key}) : super(key: key);
+  final bool showWalletCards;
+
+  const ThemeOneWidget({Key? key, this.showWalletCards = true}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +24,7 @@ class ThemeOneWidget extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 100),
               child: Column(
                 children: [
-                  // 2. بطاقات المحافظ الثلاث وأرصدتها الحقيقية: YER وUSD وSAR
-                  MultiWalletCardsWidget(),
+                  if (showWalletCards) const MultiWalletCardsWidget(),
 
                   // 3. البنر الأصلي "BannerWidget"
                   BannerWidget(),
