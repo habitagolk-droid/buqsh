@@ -68,6 +68,23 @@ class CashierAuthRepo {
     );
   }
 
+  /// جلب سجل حركات الكاشير من GET /api/v1/cashier/transactions.
+  Future<Response> getCashierTransactions() async {
+    final token = await getToken();
+    if (token == null || token.trim().isEmpty) {
+      return Response(
+        statusCode: 401,
+        body: {'message': 'Cashier session token is missing'},
+      );
+    }
+    final authorization = token.startsWith('Bearer ') ? token : 'Bearer $token';
+    return apiClient.getData(
+      AppConstants.cashierTransactionsUri,
+      headers: {'Authorization': authorization},
+      sensitive: true,
+    );
+  }
+
   Future<Response> getCurrentShift() {
     return apiClient.getData(
       AppConstants.cashierCurrentShiftUri,
