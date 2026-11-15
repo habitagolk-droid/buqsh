@@ -61,6 +61,21 @@ class CashierSessionInfo {
     return _findString(['cashier_code', 'code', 'id', 'username']);
   }
 
+  double? get availableBalance {
+    final value = _findString([
+      'available_balance',
+      'current_balance',
+      'balance',
+      'wallet_balance',
+    ]);
+    return value == null ? null : double.tryParse(value.replaceAll(',', ''));
+  }
+
+  String get balanceCurrencyCode {
+    return (_findString(['currency_code', 'currencyCode', 'currency']) ?? 'YER')
+        .toUpperCase();
+  }
+
   String? get terminalName {
     return _findString(['terminal_name', 'terminal_number', 'terminal_id']) ??
         _findNestedString('terminal', ['terminal_number', 'name', 'id']);

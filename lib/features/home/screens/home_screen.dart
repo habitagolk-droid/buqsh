@@ -34,9 +34,15 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.find<SplashController>().getConfigData();
     }
 
-    if (Get.find<CashierAuthController>().isSessionReady) {
+    final cashierController = Get.find<CashierAuthController>();
+    if (cashierController.isSessionReady) {
+      final walletController = Get.find<CashierWalletController>();
+      walletController.setSessionBalanceFallback(
+        balance: cashierController.sessionInfo?.availableBalance,
+        currencyCode: cashierController.sessionInfo?.balanceCurrencyCode,
+      );
       await Get.find<BannerController>().getBannerList(reload);
-      await Get.find<CashierWalletController>().fetchCashierWallets(
+      await walletController.fetchCashierWallets(
         showLoading: true,
         forceRefresh: reload,
       );
