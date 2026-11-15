@@ -8,11 +8,14 @@ import 'package:six_cash/features/home/controllers/menu_controller.dart';
 import 'package:six_cash/features/home/widgets/bottom_item_widget.dart';
 import 'package:six_cash/features/home/widgets/floating_action_button_widget.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/screens/cashier_return_change_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_profile_screen.dart';
+import 'package:six_cash/features/pos/screens/pos_payment_screen.dart';
 import 'package:six_cash/features/pos/transactions/cashier_transactions_screen.dart';
 import 'package:six_cash/features/splash/screens/splash_screen.dart';
 import 'package:six_cash/helper/dialog_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
+import 'package:six_cash/util/app_constants.dart';
 import 'package:six_cash/util/color_resources.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/images.dart';
@@ -193,26 +196,74 @@ class _NavBarScreenState extends State<NavBarScreen> {
     final cashier = Get.find<CashierAuthController>();
     final menu = Get.find<MenuItemController>();
     final info = cashier.sessionInfo;
+    final primary = Theme.of(context).primaryColor;
 
-    Widget item({required IconData icon, required String title, required VoidCallback onTap}) {
-      return ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        title: Text(title, style: rubikMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color)),
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-      );
+    Widget section(String title) => Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 20, 6),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(
+              title,
+              style: rubikSemiBold.copyWith(
+                color: primary,
+                fontSize: Dimensions.fontSizeSmall,
+              ),
+            ),
+          ),
+        );
+
+    Widget item({
+      required IconData icon,
+      required String title,
+      required VoidCallback onTap,
+      bool destructive = false,
+    }) =>
+        ListTile(
+          leading: Icon(
+            icon,
+            color: destructive ? Colors.redAccent : primary,
+            size: 22,
+          ),
+          title: Text(
+            title,
+            style: rubikMedium.copyWith(
+              color: destructive
+                  ? Colors.redAccent
+                  : Theme.of(context).textTheme.bodyLarge?.color,
+              fontSize: Dimensions.fontSizeDefault,
+            ),
+          ),
+          trailing: Icon(
+            Icons.chevron_right_rounded,
+            color: Theme.of(context).hintColor,
+            size: 20,
+          ),
+          onTap: onTap,
+          contentPadding: const EdgeInsetsDirectional.only(start: 20, end: 12),
+          visualDensity: const VisualDensity(vertical: -1),
+        );
+
+    void openRoute(String route) {
+      Navigator.pop(context);
+      Get.toNamed(route);
+    }
+
+    void selectTab(VoidCallback select) {
+      Navigator.pop(context);
+      select();
     }
 
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: primary,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
@@ -222,13 +273,16 @@ class _NavBarScreenState extends State<NavBarScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    radius: 27,
+                    radius: 30,
                     backgroundColor: Colors.white.withOpacity(0.16),
-                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 30),
+                    child: const Icon(Icons.person_rounded,
+                        color: Colors.white, size: 32),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    info?.cashierName ?? 'cashier'.tr,
+                    info?.cashierName?.isNotEmpty == true
+                        ? info!.cashierName!
+                        : 'cashier'.tr,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: rubikBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeLarge),
@@ -252,54 +306,112 @@ class _NavBarScreenState extends State<NavBarScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  item(
-                    icon: Icons.home_rounded,
-                    title: 'home'.tr,
-                    onTap: () { Navigator.pop(context); menu.selectHomePage(); },
-                  ),
-                  item(
-                    icon: Icons.account_balance_wallet_rounded,
-                    title: 'wallets'.tr,
-                    onTap: () { Navigator.pop(context); Get.toNamed(RouteHelper.cashierWallets); },
-                  ),
-                  item(
-                    icon: Icons.history_rounded,
-                    title: 'history'.tr,
-                    onTap: () { Navigator.pop(context); menu.selectHistoryPage(); },
-                  ),
-                  item(
-                    icon: Icons.person_rounded,
-                    title: 'profile'.tr,
-                    onTap: () { Navigator.pop(context); menu.selectProfilePage(); },
-                  ),
-                  const Divider(indent: 16, endIndent: 16),
-                  item(
-                    icon: Icons.logout_rounded,
-                    title: 'logout'.tr,
-                    onTap: () {
-                      Navigator.pop(context);
-                      Get.dialog(
-                        AlertDialog(
-                          title: Text('are_you_sure'.tr),
-                          content: Text('are_you_sure_you_want_to_logout'.tr),
-                          actions: [
-                            TextButton(onPressed: Get.back, child: Text('cancel'.tr)),
-                            TextButton(
-                              onPressed: () => cashier.logout(),
-                              child: Text('logout'.tr, style: const TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ],
+            section('account'.tr),
+            item(
+              icon: Icons.home_rounded,
+              title: 'home'.tr,
+              onTap: () => selectTab(menu.selectHomePage),
+            ),
+            item(
+              icon: Icons.account_balance_wallet_rounded,
+              title: 'wallets'.tr,
+              onTap: () => openRoute(RouteHelper.cashierWallets),
+            ),
+            item(
+              icon: Icons.history_rounded,
+              title: 'cashier_reports'.tr,
+              onTap: () => selectTab(menu.selectHistoryPage),
+            ),
+            item(
+              icon: Icons.person_rounded,
+              title: 'profile'.tr,
+              onTap: () => selectTab(menu.selectProfilePage),
+            ),
+            const Divider(indent: 16, endIndent: 16, height: 8),
+            section('cashier_dashboard'.tr),
+            item(
+              icon: Icons.point_of_sale_rounded,
+              title: 'cashier_start_sale'.tr,
+              onTap: () => openRoute(RouteHelper.cashierPosSale),
+            ),
+            item(
+              icon: Icons.calculate_outlined,
+              title: 'cashier_change_calculator'.tr,
+              onTap: () {
+                Navigator.pop(context);
+                Get.to(() => const CashierReturnChangeScreen());
+              },
+            ),
+            item(
+              icon: Icons.payment_rounded,
+              title: 'cashier_topup_payment'.tr,
+              onTap: () => openRoute(RouteHelper.posPayment),
+            ),
+            item(
+              icon: Icons.favorite_border_rounded,
+              title: 'cashier_favorites'.tr,
+              onTap: () {
+                Navigator.pop(context);
+                Get.to(() => const PosPaymentScreen(showFavoritesOnOpen: true));
+              },
+            ),
+            const Divider(indent: 16, endIndent: 16, height: 8),
+            section('support'.tr),
+            if (AppConstants.languages.length > 1)
+              item(
+                icon: Icons.language_rounded,
+                title: 'change_language'.tr,
+                onTap: () => openRoute(RouteHelper.choseLanguageScreen),
               ),
+            item(
+              icon: Icons.support_agent_rounded,
+              title: '24_support'.tr,
+              onTap: () => openRoute(RouteHelper.support),
+            ),
+            item(
+              icon: Icons.help_outline_rounded,
+              title: 'faq'.tr,
+              onTap: () => openRoute(RouteHelper.faq),
+            ),
+            const Divider(indent: 16, endIndent: 16, height: 8),
+            section('policies'.tr),
+            item(
+              icon: Icons.info_outline_rounded,
+              title: 'about_us'.tr,
+              onTap: () => openRoute(RouteHelper.aboutUs),
+            ),
+            item(
+              icon: Icons.description_outlined,
+              title: 'terms'.tr,
+              onTap: () => openRoute(RouteHelper.terms),
+            ),
+            item(
+              icon: Icons.privacy_tip_outlined,
+              title: 'privacy_policy'.tr,
+              onTap: () => openRoute(RouteHelper.privacy),
+            ),
+            const Divider(indent: 16, endIndent: 16, height: 8),
+            item(
+              icon: Icons.logout_rounded,
+              title: 'logout'.tr,
+              destructive: true,
+              onTap: () {
+                Navigator.pop(context);
+                Get.dialog(
+                  AlertDialog(
+                    title: Text('are_you_sure'.tr),
+                    content: Text('are_you_sure_you_want_to_logout'.tr),
+                    actions: [
+                      TextButton(onPressed: Get.back, child: Text('cancel'.tr)),
+                      TextButton(
+                        onPressed: () => cashier.logout(),
+                        child: Text('logout'.tr,
+                            style: const TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),

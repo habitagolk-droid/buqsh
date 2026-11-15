@@ -452,6 +452,7 @@
   "show_password": "إظهار كلمة المرور",
   "hide_password": "إخفاء كلمة المرور",
   "cashier_dashboard": "لوحة الكاشير",
+  "cashier_start_sale": "عملية بيع جديدة",
   "cashier_code": "كود الكاشير",
   "no_previous_transactions": "لا توجد عمليات سابقة",
   "notes": "ملاحظات",
