@@ -4,6 +4,7 @@ import 'package:six_cash/features/history/controllers/transaction_history_contro
 import 'package:six_cash/features/history/domain/models/transaction_model.dart';
 import 'package:six_cash/features/history/utils/transaction_formatting.dart';
 import 'package:six_cash/features/home/widgets/services_grid_widget.dart';
+import 'package:six_cash/features/home/widgets/banner_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
@@ -47,11 +48,11 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
         children: [
           if (_showAlert) _buildAlertBanner(),
           _buildWalletSection(),
-          _buildPromoBanner(),
+          _buildRestoredBanner(),
           _buildSectionTitle('الخدمات'),
           const ServicesGridWidget(),
           _buildTransactionsSection(),
-          const SizedBox(height: 88),
+          const SizedBox(height: 120),
         ],
       ),
     );
@@ -176,13 +177,10 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
         width: 320,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [_primary, _dark],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
+          color: Colors.white,
+          border: Border.all(color: _primary.withOpacity(.10)),
           boxShadow: const [
-            BoxShadow(color: Color(0x260A3A2A), blurRadius: 12, offset: Offset(0, 5)),
+            BoxShadow(color: Color(0x180A3A2A), blurRadius: 12, offset: Offset(0, 5)),
           ],
         ),
         padding: const EdgeInsets.all(20),
@@ -192,21 +190,21 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('حساب', style: rubikRegular.copyWith(color: Colors.white, fontSize: 14)),
-                Text(wallet.currencyName, style: rubikBold.copyWith(color: Colors.white, fontSize: 18)),
+                Text('حساب', style: rubikRegular.copyWith(color: Colors.black54, fontSize: 14)),
+                Text(wallet.currencyName, style: rubikBold.copyWith(color: _dark, fontSize: 18)),
               ],
             ),
             const Spacer(),
             Text(
               _hideBalances ? '••••••••' : '$balance ${wallet.currencySymbol}',
               textAlign: TextAlign.right,
-              style: rubikBold.copyWith(color: Colors.white, fontSize: 24),
+              style: rubikBold.copyWith(color: _dark, fontSize: 24),
             ),
             const SizedBox(height: 2),
             Text(
               wallet.currencyCode,
               textAlign: TextAlign.right,
-              style: rubikRegular.copyWith(color: Colors.white70, fontSize: 12),
+              style: rubikRegular.copyWith(color: Colors.black45, fontSize: 12),
             ),
             const Spacer(),
             Row(
@@ -229,7 +227,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                       width: 8,
                       height: 8,
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle),
                     ),
                   ),
                 ),
@@ -271,6 +269,48 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     );
   }
 
+  Widget _buildRestoredBanner() {
+    return GetBuilder<SplashController>(
+      builder: (splashController) {
+        final bannerEnabled =
+            splashController.configModel?.systemFeature?.bannerStatus ?? false;
+        return Container(
+          height: 120,
+          margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8F0EE),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _primary.withOpacity(.12)),
+          ),
+          child: bannerEnabled
+              ? const BannerWidget()
+              : Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(Icons.image_outlined, size: 34, color: _primary.withOpacity(.65)),
+                    Positioned(
+                      right: 14,
+                      bottom: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: _dark.withOpacity(.92),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'بنر ترويجي',
+                          style: rubikMedium.copyWith(color: Colors.white, fontSize: 11),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
@@ -305,7 +345,12 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
                 child: Text('لا توجد عمليات حديثة', textAlign: TextAlign.right, style: rubikRegular.copyWith(color: Colors.grey[600], fontSize: 13)),
               )
             else
-              ...items.map(_buildTransactionCard),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                itemBuilder: (_, index) => _buildTransactionCard(items[index]),
+              ),
           ],
         );
       },
@@ -326,11 +371,6 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
       ),
       child: Row(
         children: [
-          Text(
-            '${credit ? '+' : '-'} $amount',
-            style: rubikBold.copyWith(color: credit ? _primary : _dark, fontSize: 16),
-          ),
-          const Spacer(),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -338,7 +378,7 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
               children: [
                 Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: rubikBold.copyWith(color: _dark, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text(formatTransactionDate(item.createdAt), style: rubikRegular.copyWith(color: Colors.grey[600], fontSize: 12)),
+                Text(formatTransactionDate(item.createdAt), maxLines: 1, overflow: TextOverflow.ellipsis, style: rubikRegular.copyWith(color: Colors.grey[600], fontSize: 11)),
               ],
             ),
           ),
@@ -348,6 +388,16 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
             height: 40,
             decoration: const BoxDecoration(color: _soft, shape: BoxShape.circle),
             child: Icon(credit ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded, size: 20, color: credit ? _primary : _dark),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              '${credit ? '+' : '-'} $amount',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: rubikBold.copyWith(color: credit ? _primary : _dark, fontSize: 14),
+            ),
           ),
         ],
       ),

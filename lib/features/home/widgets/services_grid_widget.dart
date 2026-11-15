@@ -29,12 +29,12 @@ class _ServiceItem {
 class ServicesGridWidget extends StatelessWidget {
   const ServicesGridWidget({Key? key}) : super(key: key);
 
-  static const Color _colorPrimaryDark = Color(0xFF003840);
-  static const Color _colorSecondary = Color(0xFF086048);
-  static const Color _colorAccent = Color(0xFFB8F8A8);
+  static const Color _colorPrimaryDark = Color(0xFF0C4A40);
+  static const Color _colorSecondary = Color(0xFF278D5B);
+  static const Color _colorAccent = Color(0xFFD4E157);
   static const Color _colorMint = Color(0xFF50D0A0);
   static const Color _colorIconCircleBg = Color(0xFFE0F5EC);
-  static const Color _colorScreenBg = Color(0xFFF2FAF5);
+  static const Color _colorScreenBg = Color(0xFFF8F9FA);
   static const Color _colorCardBg = Color(0xFFFFFFFF);
 
   bool _hasAccentDetail(IconData icon) =>

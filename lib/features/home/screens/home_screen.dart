@@ -92,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onRefresh: () async => await _loadData(context, true),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 120),
                 child: GetBuilder<SplashController>(
                   builder: (splashController) {
                     int themeIndex =

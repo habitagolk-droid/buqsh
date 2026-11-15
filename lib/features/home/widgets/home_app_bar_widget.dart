@@ -218,12 +218,26 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return Container(
-      color: const Color(0xFFF4F5F7),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      color: const Color(0xFF0C4A40),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         textDirection: TextDirection.rtl,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          ClipOval(
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: profileController.userInfo?.image?.isNotEmpty == true
+                  ? CustomImageWidget(
+                      image: '${Get.find<SplashController>().configModel!.baseUrls!.customerImageUrl}/${profileController.userInfo!.image}',
+                      fit: BoxFit.cover,
+                      placeholder: Images.avatar,
+                    )
+                  : Image.asset(Images.avatar, fit: BoxFit.cover),
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,8 +245,8 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 Text(
                   'مساء الخير',
                   style: rubikBold.copyWith(
-                    fontSize: 22,
-                    color: const Color(0xFF0A3A2A),
+                    fontSize: 14,
+                    color: Colors.white70,
                   ),
                 ),
                 Text(
@@ -240,14 +254,24 @@ class HomeAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: rubikRegular.copyWith(
-                    fontSize: 14,
-                    color: const Color(0xFF9E9E9E),
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 12),
+          actionButton(
+            icon: Icons.qr_code_2_rounded,
+            onTap: () => Navigator.of(context).push(
+              HeroDialogRouteWidget(
+                builder: (_) => const _QrPopupCardWidget(),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           actionButton(
             icon: Icons.support_agent_rounded,
             onTap: () => Get.toNamed(RouteHelper.support),
