@@ -4,6 +4,8 @@ import 'package:local_auth/local_auth.dart';
 import 'package:six_cash/common/widgets/custom_ink_well_widget.dart';
 import 'package:six_cash/features/transaction_money/screens/send_money_screen.dart';
 import 'package:six_cash/features/transaction_money/screens/transaction_balance_input_screen.dart';
+import 'package:six_cash/features/pos/screens/cashier_return_change_screen.dart';
+import 'package:six_cash/features/pos/screens/pos_payment_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
@@ -108,34 +110,29 @@ class ServicesGridWidget extends StatelessWidget {
   List<_ServiceItem> _getCashierServices(BuildContext context) {
     return [
       _ServiceItem(
-        key: 'عملية بيع جديدة',
-        icon: Icons.point_of_sale_outlined,
-        onTap: () => Get.toNamed(RouteHelper.cashierPosSale),
-      ),
-      _ServiceItem(
-        key: 'إرجاع مبلغ (Refund)',
-        icon: Icons.replay_rounded,
+        key: 'cashier_return_purchases',
+        icon: Icons.assignment_return_outlined,
         onTap: () => _showRefundDialog(context),
       ),
       _ServiceItem(
-        key: 'إدارة الوردية',
-        icon: Icons.access_time_filled_rounded,
-        onTap: () => _showShiftDialog(context),
+        key: 'cashier_change_calculator',
+        icon: Icons.calculate_outlined,
+        onTap: () => Get.to(() => const CashierReturnChangeScreen()),
       ),
       _ServiceItem(
-        key: 'سجل العمليات',
-        icon: Icons.receipt_long_outlined,
+        key: 'cashier_topup_payment',
+        icon: Icons.payment_outlined,
+        onTap: () => Get.toNamed(RouteHelper.posPayment),
+      ),
+      _ServiceItem(
+        key: 'cashier_reports',
+        icon: Icons.bar_chart_outlined,
         onTap: () => Get.toNamed(RouteHelper.history),
       ),
       _ServiceItem(
-        key: 'بيانات الجهاز',
-        icon: Icons.devices_outlined,
-        onTap: () => _showTerminalDialog(context),
-      ),
-      _ServiceItem(
-        key: 'إغلاق الوردية',
-        icon: Icons.lock_clock_outlined,
-        onTap: () => _showCloseShiftDialog(context),
+        key: 'cashier_favorites',
+        icon: Icons.favorite_border_rounded,
+        onTap: () => Get.to(() => const PosPaymentScreen(showFavoritesOnOpen: true)),
       ),
     ];
   }

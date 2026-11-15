@@ -135,23 +135,23 @@ class _NavBarScreenState extends State<NavBarScreen> {
                           ),
                           Expanded(
                             child: BottomItemWidget(
-                              onTop: menuController.selectHistoryPage,
-                              icon: menuController.currentTabIndex == 1
-                                  ? Images.clockIconBold
-                                  : Images.clockIcon,
-                              name: 'history'.tr,
-                              selectIndex: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 72),
-                          Expanded(
-                            child: BottomItemWidget(
                               onTop: menuController.selectNotificationPage,
                               icon: menuController.currentTabIndex == 2
                                   ? Images.notificationIconBold
                                   : Images.notificationIcon,
                               name: 'notification'.tr,
                               selectIndex: 2,
+                            ),
+                          ),
+                          const SizedBox(width: 72),
+                          Expanded(
+                            child: BottomItemWidget(
+                              onTop: menuController.selectHistoryPage,
+                              icon: menuController.currentTabIndex == 1
+                                  ? Images.clockIconBold
+                                  : Images.clockIcon,
+                              name: 'history'.tr,
+                              selectIndex: 1,
                             ),
                           ),
                           Expanded(
