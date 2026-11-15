@@ -452,6 +452,8 @@
   "show_password": "إظهار كلمة المرور",
   "hide_password": "إخفاء كلمة المرور",
   "cashier_dashboard": "لوحة الكاشير",
+  "cashier_code": "كود الكاشير",
+  "no_previous_transactions": "لا توجد عمليات سابقة",
   "notes": "ملاحظات",
   "authenticate_to_confirm_transaction": "تحقق من هويتك للسماح بتنفيذ هذه العملية",
   "transaction_authentication_cancelled": "تعذر التحقق من الهوية أو تم إلغاء التحقق. لم تُرسل العملية.",

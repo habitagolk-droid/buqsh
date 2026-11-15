@@ -61,7 +61,9 @@ class _NavBarScreenState extends State<NavBarScreen> {
                 drawer: isCashier ? _buildCashierDrawer(context) : null,
                 body: PageStorage(
                   bucket: bucket,
-                  child: isCashier && menuController.currentTabIndex == 1
+                  child: isCashier &&
+                          (menuController.currentTabIndex == 1 ||
+                              menuController.currentTabIndex == 2)
                       ? const CashierTransactionsScreen()
                       : isCashier && menuController.currentTabIndex == 3
                           ? const CashierProfileScreen()
@@ -142,10 +144,14 @@ class _NavBarScreenState extends State<NavBarScreen> {
                           Expanded(
                             child: BottomItemWidget(
                               onTop: menuController.selectNotificationPage,
-                              icon: menuController.currentTabIndex == 2
-                                  ? Images.notificationIconBold
-                                  : Images.notificationIcon,
-                              name: 'notification'.tr,
+                              icon: isCashier
+                                  ? (menuController.currentTabIndex == 2
+                                      ? Images.clockIconBold
+                                      : Images.clockIcon)
+                                  : (menuController.currentTabIndex == 2
+                                      ? Images.notificationIconBold
+                                      : Images.notificationIcon),
+                              name: isCashier ? 'history'.tr : 'notification'.tr,
                               selectIndex: 2,
                             ),
                           ),

@@ -449,6 +449,8 @@
   "show_password": "Show password",
   "hide_password": "Hide password",
   "cashier_dashboard": "Cashier Dashboard",
+  "cashier_code": "Cashier Code",
+  "no_previous_transactions": "No previous transactions",
   "notes": "Notes",
   "authenticate_to_confirm_transaction": "Verify your identity to authorize this transaction",
   "transaction_authentication_cancelled": "Authentication failed or was cancelled. The transaction was not sent.",

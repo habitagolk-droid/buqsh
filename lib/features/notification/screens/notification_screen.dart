@@ -14,6 +14,8 @@ import 'package:six_cash/common/widgets/no_data_widget.dart';
 import 'package:six_cash/common/widgets/paginated_list_widget.dart';
 import 'package:six_cash/features/notification/widgets/notification_dialog_widget.dart';
 import 'package:six_cash/features/notification/widgets/notification_shimmer_widget.dart';
+import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/transactions/cashier_transactions_screen.dart';
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({ Key? key }) : super(key: key);
 
@@ -25,6 +27,9 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
+    if (Get.find<CashierAuthController>().isSessionReady) {
+      return const CashierTransactionsScreen();
+    }
     final ScrollController scrollController = ScrollController();
     return Scaffold(
       appBar: CustomAppbarWidget(title: 'notification'.tr, onlyTitle: true),

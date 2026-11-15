@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
 import 'package:six_cash/util/styles.dart';
 
 class CashierProfileScreen extends StatelessWidget {
   const CashierProfileScreen({super.key});
 
-  static const _primary = Color(0xFF086048);
+  static const _green = Color(0xFF086048);
+  static const _background = Color(0xFFF2FAF5);
+
+  String _formatBalance(double? value) {
+    if (value == null) return '—';
+    return value.toStringAsFixed(2).replaceAllMapped(
+          RegExp(r'(\d)(?=(\d{3})+\.)'),
+          (match) => '${match[1]},',
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2FAF5),
+      backgroundColor: _background,
       appBar: AppBar(
         title: Text('profile'.tr, style: rubikBold),
-        backgroundColor: _primary,
+        backgroundColor: _green,
         foregroundColor: Colors.white,
       ),
       body: GetBuilder<CashierAuthController>(
-        builder: (controller) {
-          final info = controller.sessionInfo;
-          if (controller.isSessionInfoLoading && info == null) {
+        builder: (auth) {
+          final info = auth.sessionInfo;
+          if (auth.isSessionInfoLoading && info == null) {
             return const Center(child: CircularProgressIndicator());
           }
           if (info == null) {
@@ -31,13 +41,13 @@ class CashierProfileScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      controller.sessionInfoError ?? 'cashier_session_no_details'.tr,
+                      auth.sessionInfoError ?? 'cashier_session_no_details'.tr,
                       textAlign: TextAlign.center,
                       style: rubikRegular,
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
-                      onPressed: controller.retrySessionInfo,
+                      onPressed: auth.retrySessionInfo,
                       icon: const Icon(Icons.refresh_rounded),
                       label: Text('retry'.tr),
                     ),
@@ -47,53 +57,54 @@ class CashierProfileScreen extends StatelessWidget {
             );
           }
 
-          final displayName = info.cashierName ?? 'cashier'.tr;
-          final summary = <(String, String, IconData)>[
-            if (info.cashierCode?.isNotEmpty == true)
-              ('cashier_id'.tr, info.cashierCode!, Icons.badge_outlined),
-            if (info.terminalName?.isNotEmpty == true)
-              ('terminal_name'.tr, info.terminalName!, Icons.point_of_sale_outlined),
-            if (info.merchantName?.isNotEmpty == true)
-              ('merchant_name'.tr, info.merchantName!, Icons.store_outlined),
-            if (info.branchName?.isNotEmpty == true)
-              ('branch'.tr, info.branchName!, Icons.location_on_outlined),
-          ];
-          final extraFields = info.displayFields
-              .where((field) => field.value != displayName)
-              .toList();
+          final name = info.cashierName?.trim().isNotEmpty == true
+              ? info.cashierName!.trim()
+              : 'cashier'.tr;
+          final code = info.cashierCode?.trim().isNotEmpty == true
+              ? info.cashierCode!.trim()
+              : '—';
 
           return RefreshIndicator(
-            onRefresh: controller.retrySessionInfo,
+            onRefresh: () async {
+              await auth.retrySessionInfo();
+              if (Get.isRegistered<CashierWalletController>()) {
+                await Get.find<CashierWalletController>()
+                    .fetchCashierWallets(forceRefresh: true);
+              }
+            },
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
               children: [
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                    color: _primary,
-                    borderRadius: BorderRadius.circular(20),
+                    color: _green,
+                    borderRadius: BorderRadius.circular(24),
                   ),
                   child: Row(
                     children: [
                       const CircleAvatar(
-                        radius: 30,
+                        radius: 32,
                         backgroundColor: Colors.white24,
-                        child: Icon(Icons.person_rounded, color: Colors.white, size: 32),
+                        child: Icon(Icons.person_rounded,
+                            color: Colors.white, size: 34),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('cashier'.tr,
-                                style: rubikRegular.copyWith(color: Colors.white70)),
-                            const SizedBox(height: 4),
+                                style: rubikRegular.copyWith(
+                                    color: Colors.white70, fontSize: 15)),
+                            const SizedBox(height: 5),
                             Text(
-                              displayName,
-                              maxLines: 1,
+                              name,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: rubikBold.copyWith(color: Colors.white, fontSize: 20),
+                              style: rubikBold.copyWith(
+                                  color: Colors.white, fontSize: 21),
                             ),
                           ],
                         ),
@@ -102,63 +113,36 @@ class CashierProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (summary.isNotEmpty)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Column(
-                      children: [
-                        for (var i = 0; i < summary.length; i++) ...[
-                          ListTile(
-                            leading: Icon(summary[i].$3, color: _primary),
-                            title: Text(summary[i].$1, style: rubikRegular),
-                            subtitle: Text(summary[i].$2, style: rubikMedium),
-                          ),
-                          if (i != summary.length - 1)
-                            const Divider(height: 1, indent: 64),
-                        ],
-                      ],
-                    ),
-                  ),
-                if (extraFields.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  Text('بيانات الجلسة', style: rubikBold.copyWith(fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Column(
-                      children: [
-                        for (var i = 0; i < extraFields.length; i++) ...[
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(extraFields[i].key, style: rubikRegular),
-                            trailing: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.sizeOf(context).width * 0.48,
-                              ),
-                              child: Text(
-                                extraFields[i].value,
-                                textAlign: TextAlign.end,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: rubikMedium,
-                              ),
-                            ),
-                          ),
-                          if (i != extraFields.length - 1)
-                            const Divider(height: 1),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-                if (controller.isSessionInfoLoading)
+                _infoCard(
+                  icon: Icons.badge_outlined,
+                  label: 'cashier_code'.tr,
+                  value: code,
+                ),
+                const SizedBox(height: 12),
+                GetBuilder<CashierWalletController>(
+                  init: Get.find<CashierWalletController>(),
+                  builder: (walletController) {
+                    final selected = walletController.selectedCashierWallet ??
+                        (walletController.displayWallets.isNotEmpty
+                            ? walletController.displayWallets.first
+                            : null);
+                    return _infoCard(
+                      icon: Icons.account_balance_wallet_outlined,
+                      label: 'available_balance'.tr,
+                      value: selected == null
+                          ? (walletController.isLoading ? '…' : '—')
+                          : '${_formatBalance(selected.currentBalance)} ${selected.currencyCode}',
+                      trailing: walletController.isLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : null,
+                    );
+                  },
+                ),
+                if (auth.isSessionInfoLoading)
                   const Padding(
                     padding: EdgeInsets.all(16),
                     child: Center(child: CircularProgressIndicator()),
@@ -167,6 +151,40 @@ class CashierProfileScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _infoCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    Widget? trailing,
+  }) {
+    return Card(
+      margin: EdgeInsets.zero,
+      color: Colors.white,
+      elevation: 1.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        leading: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: _green.withValues(alpha: 0.09),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: _green),
+        ),
+        title: Text(label,
+            style: rubikRegular.copyWith(color: Colors.black54, fontSize: 13)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(value,
+              style: rubikSemiBold.copyWith(color: _green, fontSize: 17)),
+        ),
+        trailing: trailing,
       ),
     );
   }

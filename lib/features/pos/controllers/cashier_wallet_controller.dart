@@ -11,6 +11,7 @@ class CashierWalletController extends GetxController {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _hasLoaded = false;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
@@ -31,18 +32,32 @@ class CashierWalletController extends GetxController {
   List<WalletModel> get displayWallets {
     // لا تعرض رصيد التاجر على أنه رصيد الكاشير. هذه الشاشة خاصة بحساب
     // الكاشير، لذا لا نستخدم محافظ التاجر كبديل للعملات المفقودة.
-    final wallets = List<WalletModel>.of(cashierWallets);
-    const order = ['YER', 'USD', 'SAR'];
-    wallets.sort((a, b) {
-      final ai = order.indexOf(a.currencyCode);
-      final bi = order.indexOf(b.currencyCode);
-      final ap = ai < 0 ? order.length : ai;
-      final bp = bi < 0 ? order.length : bi;
-      return ap == bp
-          ? a.currencyCode.compareTo(b.currencyCode)
-          : ap.compareTo(bp);
-    });
-    return wallets;
+    if (_walletsData == null) return const [];
+    final byCurrency = {
+      for (final wallet in cashierWallets) wallet.currencyCode: wallet,
+    };
+    const definitions = <String, (String, String)>{
+      'YER': ('﷼', 'الريال اليمني'),
+      'SAR': ('ر.س', 'الريال السعودي'),
+      'USD': ('\$', 'الدولار الأمريكي'),
+    };
+    for (final entry in definitions.entries) {
+      byCurrency.putIfAbsent(
+        entry.key,
+        () => WalletModel(
+          id: 0,
+          currencyCode: entry.key,
+          currencySymbol: entry.value.$1,
+          currencyName: entry.value.$2,
+          currentBalance: 0,
+          baseEquivalent: 0,
+          isDefault: false,
+          pendingBalance: 0,
+        ),
+      );
+    }
+    const order = ['YER', 'SAR', 'USD'];
+    return order.map((code) => byCurrency[code]!).toList(growable: false);
   }
 
   @override
@@ -52,10 +67,14 @@ class CashierWalletController extends GetxController {
   }
 
   /// استدعاء GET /api/v1/cashier/wallets مع إرسال توكن الكاشير
-  Future<void> fetchCashierWallets({bool showLoading = true}) async {
+  Future<void> fetchCashierWallets({
+    bool showLoading = true,
+    bool forceRefresh = false,
+  }) async {
+    if (_isLoading || (_hasLoaded && !forceRefresh)) return;
+    _isLoading = true;
+    _errorMessage = null;
     if (showLoading) {
-      _isLoading = true;
-      _errorMessage = null;
       update();
     }
 
@@ -94,6 +113,7 @@ class CashierWalletController extends GetxController {
       _errorMessage = 'حدث خطأ أثناء جلب بيانات المحافظ';
     } finally {
       _isLoading = false;
+      _hasLoaded = true;
       update();
     }
   }
