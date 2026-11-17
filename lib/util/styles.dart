@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
 
-const rubikLight = TextStyle(
-  fontFamily: 'Cairo',
-  fontWeight: FontWeight.w300,
-);
+const rubikLight = TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w300);
 
 const rubikRegular = TextStyle(
   fontFamily: 'Cairo',
   fontWeight: FontWeight.w400,
 );
 
-const rubikMedium = TextStyle(
-  fontFamily: 'Cairo',
-  fontWeight: FontWeight.w500,
-);
+const rubikMedium = TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w500);
 
 const rubikSemiBold = TextStyle(
   fontFamily: 'Cairo',
   fontWeight: FontWeight.w600,
 );
 
-const rubikBold = TextStyle(
-  fontFamily: 'Cairo',
-  fontWeight: FontWeight.w700,
-);
+const rubikBold = TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700);
 
 // BUQSH typography scale. The legacy rubik* names remain above because they
 // are used throughout the existing feature tree.
@@ -75,4 +66,3 @@ const smallLabelStyle = TextStyle(
   fontWeight: FontWeight.w500,
   fontSize: 12.0,
 );
-

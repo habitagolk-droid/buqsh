@@ -10,9 +10,12 @@ class CustomLoaderWidget extends StatefulWidget {
     this.itemBuilder,
     this.duration = const Duration(milliseconds: 500),
     this.controller,
-  })  : assert(!(itemBuilder is IndexedWidgetBuilder && color is Color) && !(itemBuilder == null && color == null),
-  'You should specify either a itemBuilder or a color'),
-        super(key: key);
+  }) : assert(
+         !(itemBuilder is IndexedWidgetBuilder && color is Color) &&
+             !(itemBuilder == null && color == null),
+         'You should specify either a itemBuilder or a color',
+       ),
+       super(key: key);
 
   final Color? color;
   final double size;
@@ -24,7 +27,8 @@ class CustomLoaderWidget extends StatefulWidget {
   State<CustomLoaderWidget> createState() => _CustomLoaderWidgetState();
 }
 
-class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTickerProviderStateMixin {
+class _CustomLoaderWidgetState extends State<CustomLoaderWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
   late bool _ownsController;
   late VoidCallback _animationListener;
@@ -39,10 +43,15 @@ class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTick
     _animationListener = () {
       if (mounted) setState(() {});
     };
-    controller = (widget.controller ?? AnimationController(vsync: this, duration: widget.duration))
-      ..addListener(_animationListener)
-      ..repeat(reverse: true);
-    final animation = CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic);
+    controller =
+        (widget.controller ??
+              AnimationController(vsync: this, duration: widget.duration))
+          ..addListener(_animationListener)
+          ..repeat(reverse: true);
+    final animation = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeInOutCubic,
+    );
     animationCurve = Tween(begin: 1.0, end: 0.0).animate(animation);
     animationSize = Tween(begin: 0.5, end: 1.0).animate(animation);
   }
@@ -69,12 +78,13 @@ class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTick
     );
   }
 
-  Widget _itemBuilder(int index, double curveValue) => widget.itemBuilder != null
+  Widget _itemBuilder(int index, double curveValue) =>
+      widget.itemBuilder != null
       ? widget.itemBuilder!(context, index)
       : DecoratedBox(
-    decoration: BoxDecoration(
-      color: widget.color,
-      borderRadius: BorderRadius.all(Radius.circular(curveValue)),
-    ),
-  );
+          decoration: BoxDecoration(
+            color: widget.color,
+            borderRadius: BorderRadius.all(Radius.circular(curveValue)),
+          ),
+        );
 }

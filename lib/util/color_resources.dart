@@ -9,67 +9,84 @@ class ColorResources {
   static const Color buqshBackground = Color(0xFFF8F9FA);
   static const Color buqshDarkSurface = Color(0xFF1A2E2A);
 
-  static  Color getPrimaryColor() {
+  static Color getPrimaryColor() {
     return Get.isDarkMode ? buqshDarkSurface : buqshPrimary;
   }
-  static  Color getPrimaryTextColor() {
+
+  static Color getPrimaryTextColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF003E47);
   }
+
   static Color getSecondaryHeaderColor() {
     return Get.isDarkMode ? const Color(0xFFaaa818) : const Color(0xFFCFEC7E);
   }
+
   static Color getGreyColor() {
     return Get.isDarkMode ? const Color(0xFF6f7275) : const Color(0xFFA0A4A8);
   }
+
   static Color getGreyBaseGray1() {
     return Get.isDarkMode ? const Color(0xFFd3d3d8) : const Color(0xFF8E8E93);
   }
+
   static Color getLightGray() {
     return Get.isDarkMode ? const Color(0x00dbdbdb) : const Color(0xFFF3F3F3);
   }
+
   static Color getAcceptBtn() {
     return Get.isDarkMode ? const Color(0xFF065802) : const Color(0xFF95CD41);
   }
 
   static Color getGreyBaseGray3() {
     return Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFFC7C7CC);
-    
   }
+
   static Color getGreyBaseGray4() {
     return Get.isDarkMode ? const Color(0xFFe3e3e8) : const Color(0xFFD1D1D6);
-    
   }
+
   static Color getGreyBaseGray6() {
     return Get.isDarkMode ? const Color(0xFFb2b5c8) : const Color(0xFFF2F2F7);
   }
- 
+
   static Color getSearchBg() {
     return Get.isDarkMode ? const Color(0xFF585a5c) : const Color(0xFFF4F7FC);
   }
+
   static Color getBackgroundColor() {
     return Get.isDarkMode ? buqshDarkSurface : buqshBackground;
   }
+
   static Color getBlackAndWhite() {
     return Get.isDarkMode ? const Color(0xFFFFFFFF) : const Color(0xFF606060);
   }
+
   static Color getLightAndDark() {
-    return Get.isDarkMode ? Theme.of(Get.context!).cardColor : const Color(0xFF000000) ;
+    return Get.isDarkMode
+        ? Theme.of(Get.context!).cardColor
+        : const Color(0xFF000000);
   }
+
   static Color getOccupationCardColor() {
     return Get.isDarkMode ? const Color(0xFF3c3c3c) : const Color(0xFFFFFFFF);
   }
+
   static Color getHintColor() {
     return Get.isDarkMode ? const Color(0xFFB0B7C3) : const Color(0xFF4A5568);
   }
+
   static Color getSecondaryTextColor() {
     return Get.isDarkMode ? const Color(0xFFCBD5E1) : const Color(0xFF4A5568);
   }
+
   static Color getPrimaryIconColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF003E47);
   }
+
   static Color getSecondaryIconColor() {
     return Get.isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4A5568);
   }
+
   static Color getGreyBunkerColor() {
     return Get.isDarkMode ? const Color(0xFFF3F4F6) : const Color(0xFF1A1D20);
   }
@@ -77,56 +94,69 @@ class ColorResources {
   static Color getTextColor() {
     return Get.isDarkMode ? const Color(0xFFF3F4F6) : const Color(0xFF1A1D20);
   }
+
   static Color getAcceptTextColor() {
-    return Get.isDarkMode ?  const Color(0xFF1A1D20): const Color(0xFFF3F4F6);
+    return Get.isDarkMode ? const Color(0xFF1A1D20) : const Color(0xFFF3F4F6);
   }
+
   static Color getNoteTextColor() {
-    return Get.isDarkMode ?  const Color(0xFF1A1D20): const Color(0xFF14684E);
+    return Get.isDarkMode ? const Color(0xFF1A1D20) : const Color(0xFF14684E);
   }
 
-
-  
-   static Color getTransactionTitleColor() {
+  static Color getTransactionTitleColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF003E47);
   }
-   static Color getTransactionTrilingColor() {
+
+  static Color getTransactionTrilingColor() {
     return Get.isDarkMode ? const Color(0xFFCBD5E1) : const Color(0xFF2D3748);
   }
+
   static Color getWebsiteTextColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF1A1D20);
   }
+
   static Color getBalanceTextColor() {
     return Get.isDarkMode ? const Color(0xFFE2E8F0) : const Color(0xFF2D3748);
   }
+
   static Color getShadoColor() {
     return Get.isDarkMode ? const Color(0xFFededed) : const Color(0xFF848484);
   }
+
   //card.
-   static Color getAddMoneyCardColor() {
+  static Color getAddMoneyCardColor() {
     return Get.isDarkMode ? const Color(0xFF398343) : const Color(0xFFACD9B3);
   }
-   static Color getCashOutCardColor() {
+
+  static Color getCashOutCardColor() {
     return Get.isDarkMode ? const Color(0xFFf57a00) : const Color(0xFFFFCB66);
   }
-   static Color getRequestMoneyCardColor() {
+
+  static Color getRequestMoneyCardColor() {
     return Get.isDarkMode ? const Color(0xFFa900a0) : const Color(0xFFF6BDE9);
   }
-   static Color getReferFriendCardColor() {
+
+  static Color getReferFriendCardColor() {
     return Get.isDarkMode ? const Color(0xFF0083cf) : const Color(0xFFADE4FD);
   }
-   static Color getOthersCardColor() {
+
+  static Color getOthersCardColor() {
     return Get.isDarkMode ? const Color(0xFF3137c9) : const Color(0xFFD0C5FF);
-   }
-   static Color getShadowColor() {
+  }
+
+  static Color getShadowColor() {
     return Get.isDarkMode ? const Color(0xFFeeeeee) : const Color(0xFF757575);
   }
+
   //onboarding
-   static Color getOnboardingBgColor() {
+  static Color getOnboardingBgColor() {
     return Get.isDarkMode ? const Color(0xFF4a5361) : const Color(0xFFD1D5DB);
   }
+
   static Color getOnboardGreyColor() {
     return Get.isDarkMode ? const Color(0xFFe9e8f5) : const Color(0xFF6D6D78);
   }
+
   static Color getDividerColor() {
     return Get.isDarkMode ? const Color(0xFFd9d9d9) : const Color(0xFF434343);
   }
@@ -134,14 +164,16 @@ class ColorResources {
   static Color getSupportScreenTextColor() {
     return Get.isDarkMode ? const Color(0xFFe6e6e6) : const Color(0xFF484848);
   }
+
   static Color getLightGrey() {
     return Get.isDarkMode ? const Color(0xFF686868) : const Color(0xFFF8F8F8);
   }
+
   static Color getOtpFieldColor() {
     return Get.isDarkMode ? const Color(0xFF6a6e81) : const Color(0xFFF2F2F7);
   }
-  ///#686868
 
+  ///#686868
 
   static const Map<int, Color> colorMap = {
     50: Color(0x10192D6B),
@@ -188,14 +220,14 @@ class ColorResources {
   static Color themeDarkBackgroundColor = buqshDarkSurface;
   //other info
   //#6a6e81
-static Color genderDefaultColor = const Color(0xFFe3f3fd);
-static Color hintColor = const Color(0xFF4A5568);
-static Color textFieldBorderColor = const Color(0xFFD1D1D6);
+  static Color genderDefaultColor = const Color(0xFFe3f3fd);
+  static Color hintColor = const Color(0xFF4A5568);
+  static Color textFieldBorderColor = const Color(0xFFD1D1D6);
 
-//shimmer Color
-static Color? shimmerBaseColor =  Colors.grey[350];
-static Color? shimmerLightColor =  Colors.grey[200];
+  //shimmer Color
+  static Color? shimmerBaseColor = Colors.grey[350];
+  static Color? shimmerLightColor = Colors.grey[200];
 
-/// qr code scanner screen
+  /// qr code scanner screen
   static Color containerColor = const Color(0xFFD1D1D6);
 }

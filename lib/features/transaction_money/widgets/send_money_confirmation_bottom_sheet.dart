@@ -121,29 +121,118 @@ class _SendMoneyConfirmationBottomSheetState
   }
 
   Future<void> _showReceipt(Map? body) async {
-    final reference = body?['reference']?.toString() ?? body?['transaction_id']?.toString() ?? body?['data']?['reference']?.toString() ?? 'TXN-${DateTime.now().millisecondsSinceEpoch}';
+    final reference =
+        body?['reference']?.toString() ??
+        body?['transaction_id']?.toString() ??
+        body?['data']?['reference']?.toString() ??
+        'TXN-${DateTime.now().millisecondsSinceEpoch}';
     await Get.dialog(
       Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Column(children: [
-            Container(width: 44, height: 44, alignment: Alignment.center, decoration: const BoxDecoration(color: Color(0xFF0C4A40), shape: BoxShape.circle), child: const Text('J', style: TextStyle(color: Color(0xFFD4E157), fontSize: 22, fontWeight: FontWeight.w900))),
-            const SizedBox(height: 8),
-            Text('إيصال العملية', style: rubikSemiBold.copyWith(color: const Color(0xFF0C4A40), fontSize: 18)),
-          ]),
-          content: SingleChildScrollView(child: Column(children: [
-            Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF278D5B), Color(0xFF0C4A40)]), borderRadius: BorderRadius.circular(16)), child: Column(children: [Text(CurrencyFormatter.format(widget.amount, currency: widget.wallet.currencyCode), style: rubikBold.copyWith(color: Colors.white, fontSize: 24)), const SizedBox(height: 4), Text(TafqeetHelper.convert(widget.amount, currencyCode: widget.wallet.currencyCode), textAlign: TextAlign.center, style: rubikRegular.copyWith(color: const Color(0xFFD4E157), fontSize: 11))])),
-            const SizedBox(height: 12),
-            _receiptRow('المرجع', reference),
-            _receiptRow('العملية', 'تحويل إلى مشترك'),
-            _receiptRow('المستفيد', '${_maskName(widget.recipientName)}\n${widget.recipientPhone}'),
-            _receiptRow('المودع', 'محفظة ${widget.wallet.currencyCode}'),
-          ])),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Column(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF0C4A40),
+                  shape: BoxShape.circle,
+                ),
+                child: const Text(
+                  'J',
+                  style: TextStyle(
+                    color: Color(0xFFD4E157),
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'إيصال العملية',
+                style: rubikSemiBold.copyWith(
+                  color: const Color(0xFF0C4A40),
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF278D5B), Color(0xFF0C4A40)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        CurrencyFormatter.format(
+                          widget.amount,
+                          currency: widget.wallet.currencyCode,
+                        ),
+                        style: rubikBold.copyWith(
+                          color: Colors.white,
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        TafqeetHelper.convert(
+                          widget.amount,
+                          currencyCode: widget.wallet.currencyCode,
+                        ),
+                        textAlign: TextAlign.center,
+                        style: rubikRegular.copyWith(
+                          color: const Color(0xFFD4E157),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _receiptRow('المرجع', reference),
+                _receiptRow('العملية', 'تحويل إلى مشترك'),
+                _receiptRow(
+                  'المستفيد',
+                  '${_maskName(widget.recipientName)}\n${widget.recipientPhone}',
+                ),
+                _receiptRow('المودع', 'محفظة ${widget.wallet.currencyCode}'),
+              ],
+            ),
+          ),
           actions: [
-            TextButton(onPressed: () => Share.share('إيصال تحويل ${CurrencyFormatter.format(widget.amount, currency: widget.wallet.currencyCode)}\nالمرجع: $reference'), child: const Text('مشاركة')),
-            TextButton(onPressed: () { Clipboard.setData(ClipboardData(text: reference)); showCustomSnackBarHelper('تم حفظ رقم المرجع', isError: false); }, child: const Text('حفظ')),
-            FilledButton(onPressed: () => Get.back(), style: FilledButton.styleFrom(backgroundColor: const Color(0xFF0C4A40)), child: const Text('تم')),
+            TextButton(
+              onPressed: () => Share.share(
+                'إيصال تحويل ${CurrencyFormatter.format(widget.amount, currency: widget.wallet.currencyCode)}\nالمرجع: $reference',
+              ),
+              child: const Text('مشاركة'),
+            ),
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: reference));
+                showCustomSnackBarHelper('تم حفظ رقم المرجع', isError: false);
+              },
+              child: const Text('حفظ'),
+            ),
+            FilledButton(
+              onPressed: () => Get.back(),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF0C4A40),
+              ),
+              child: const Text('تم'),
+            ),
           ],
         ),
       ),
@@ -151,12 +240,32 @@ class _SendMoneyConfirmationBottomSheetState
     );
   }
 
-  String _maskName(String value) => value.length < 4 ? value : '${value.substring(0, 2)}•••${value.substring(value.length - 2)}';
+  String _maskName(String value) => value.length < 4
+      ? value
+      : '${value.substring(0, 2)}•••${value.substring(value.length - 2)}';
 
   Widget _receiptRow(String label, String value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: Text(value, textAlign: TextAlign.left, style: rubikMedium.copyWith(fontSize: 11))), Text(label, style: rubikRegular.copyWith(color: ColorResources.getGreyColor(), fontSize: 11))]),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.left,
+            style: rubikMedium.copyWith(fontSize: 11),
+          ),
+        ),
+        Text(
+          label,
+          style: rubikRegular.copyWith(
+            color: ColorResources.getGreyColor(),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +281,8 @@ class _SendMoneyConfirmationBottomSheetState
         top: Dimensions.paddingSizeDefault,
         left: Dimensions.paddingSizeDefault,
         right: Dimensions.paddingSizeDefault,
-        bottom: MediaQuery.of(context).viewInsets.bottom +
+        bottom:
+            MediaQuery.of(context).viewInsets.bottom +
             Dimensions.paddingSizeDefault,
       ),
       child: SingleChildScrollView(
@@ -185,7 +295,7 @@ class _SendMoneyConfirmationBottomSheetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                    _stage == 0 ? 'بيانات الحركة' : 'تأكيد العملية',
+                  _stage == 0 ? 'بيانات الحركة' : 'تأكيد العملية',
                   style: rubikSemiBold.copyWith(
                     fontSize: Dimensions.fontSizeLarge,
                     color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -207,8 +317,9 @@ class _SendMoneyConfirmationBottomSheetState
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
               decoration: BoxDecoration(
                 color: ColorResources.primaryColor.withOpacity(0.06),
-                borderRadius:
-                    BorderRadius.circular(Dimensions.radiusSizeDefault),
+                borderRadius: BorderRadius.circular(
+                  Dimensions.radiusSizeDefault,
+                ),
                 border: Border.all(
                   color: ColorResources.primaryColor.withOpacity(0.2),
                 ),
@@ -279,12 +390,10 @@ class _SendMoneyConfirmationBottomSheetState
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius:
-                    BorderRadius.circular(Dimensions.radiusSizeDefault),
-                border: Border.all(
-                  width: 2,
-                  color: Colors.black,
+                borderRadius: BorderRadius.circular(
+                  Dimensions.radiusSizeDefault,
                 ),
+                border: Border.all(width: 2, color: Colors.black),
               ),
               child: Row(
                 children: [
@@ -359,8 +468,7 @@ class _SendMoneyConfirmationBottomSheetState
               padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
               decoration: BoxDecoration(
                 color: ColorResources.errorColor.withOpacity(0.08),
-                borderRadius:
-                    BorderRadius.circular(Dimensions.radiusSizeSmall),
+                borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
                 border: Border.all(
                   color: ColorResources.errorColor.withOpacity(0.3),
                 ),
@@ -392,16 +500,49 @@ class _SendMoneyConfirmationBottomSheetState
             if (_stage == 1) ...[
               if (JaibAuthSettings.biometricEnabled)
                 Center(
-                  child: Column(children: [
-                    Container(width: 68, height: 68, decoration: BoxDecoration(color: const Color(0xFFEFF7DC), shape: BoxShape.circle, border: Border.all(color: const Color(0xFFD4E157), width: 2)), child: const Icon(Icons.fingerprint_rounded, color: Color(0xFF0C4A40), size: 40)),
-                    const SizedBox(height: 8),
-                    Text('استخدم البصمة أو أدخل رمز PIN', style: rubikMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: ColorResources.primaryColor)),
-                  ]),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF7DC),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFD4E157),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.fingerprint_rounded,
+                          color: Color(0xFF0C4A40),
+                          size: 40,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'استخدم البصمة أو أدخل رمز PIN',
+                        style: rubikMedium.copyWith(
+                          fontSize: Dimensions.fontSizeSmall,
+                          color: ColorResources.primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               const SizedBox(height: Dimensions.paddingSizeSmall),
-              Text('enter_pin_to_confirm'.tr, style: rubikMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color)),
+              Text(
+                'enter_pin_to_confirm'.tr,
+                style: rubikMedium.copyWith(
+                  fontSize: Dimensions.fontSizeDefault,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
               const SizedBox(height: Dimensions.paddingSizeSmall),
-              CustomPinCodeFieldWidget(padding: 0, onCompleted: (pin) => setState(() => _pin = pin)),
+              CustomPinCodeFieldWidget(
+                padding: 0,
+                onCompleted: (pin) => setState(() => _pin = pin),
+              ),
             ],
 
             const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -425,7 +566,9 @@ class _SendMoneyConfirmationBottomSheetState
                           ),
                         ),
                       ),
-                      onPressed: _isExecuting ? null : () => Navigator.of(context).pop(false),
+                      onPressed: _isExecuting
+                          ? null
+                          : () => Navigator.of(context).pop(false),
                       child: Text(
                         'cancel'.tr,
                         style: rubikMedium.copyWith(
@@ -454,8 +597,8 @@ class _SendMoneyConfirmationBottomSheetState
                       onPressed: _isExecuting
                           ? null
                           : (_stage == 0
-                              ? () => setState(() => _stage = 1)
-                              : _handleExecute),
+                                ? () => setState(() => _stage = 1)
+                                : _handleExecute),
                       child: _isExecuting
                           ? const SizedBox(
                               width: 24,

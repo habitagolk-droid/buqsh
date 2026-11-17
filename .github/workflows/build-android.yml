@@ -2,7 +2,7 @@ name: Build Android Release APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, ui2code-complete-implementation]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -47,6 +47,9 @@ jobs:
 
       - name: Install Dart dependencies
         run: flutter pub get
+
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze Dart code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings

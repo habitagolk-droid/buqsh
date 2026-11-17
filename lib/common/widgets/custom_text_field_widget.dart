@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:six_cash/util/dimensions.dart';
@@ -29,30 +28,32 @@ class CustomTextFieldWidget extends StatefulWidget {
   final bool isEnabled;
   final TextCapitalization capitalization;
 
-  const CustomTextFieldWidget(
-      {Key? key, this.hintText = 'Write something...',
-      this.controller,
-      this.focusNode,
-      this.nextFocus,
-      this.isEnabled = true,
-      this.inputType = TextInputType.text,
-      this.inputAction = TextInputAction.next,
-      this.maxLines = 1,
-      this.onSuffixTap,
-      this.fillColor,
-      this.onSubmit,
-      this.onChanged,
-      this.capitalization = TextCapitalization.none,
-      this.isCountryPicker = false,
-      this.isShowBorder = false,
-      this.isShowSuffixIcon = false,
-      this.isShowPrefixIcon = false,
-      this.onTap,
-      this.isIcon = false,
-      this.isPassword = false,
-      this.suffixIconUrl,
-      this.prefixIconUrl,
-      this.isSearch = false}) : super(key: key);
+  const CustomTextFieldWidget({
+    Key? key,
+    this.hintText = 'Write something...',
+    this.controller,
+    this.focusNode,
+    this.nextFocus,
+    this.isEnabled = true,
+    this.inputType = TextInputType.text,
+    this.inputAction = TextInputAction.next,
+    this.maxLines = 1,
+    this.onSuffixTap,
+    this.fillColor,
+    this.onSubmit,
+    this.onChanged,
+    this.capitalization = TextCapitalization.none,
+    this.isCountryPicker = false,
+    this.isShowBorder = false,
+    this.isShowSuffixIcon = false,
+    this.isShowPrefixIcon = false,
+    this.onTap,
+    this.isIcon = false,
+    this.isPassword = false,
+    this.suffixIconUrl,
+    this.prefixIconUrl,
+    this.isSearch = false,
+  }) : super(key: key);
 
   @override
   State<CustomTextFieldWidget> createState() => _CustomTextFieldWidgetState();
@@ -67,7 +68,10 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
       maxLines: widget.maxLines,
       controller: widget.controller,
       focusNode: widget.focusNode,
-      style: Theme.of(context).textTheme.displayMedium!.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeLarge),
+      style: Theme.of(context).textTheme.displayMedium!.copyWith(
+        color: Theme.of(context).textTheme.bodyLarge!.color,
+        fontSize: Dimensions.fontSizeLarge,
+      ),
       textInputAction: widget.inputAction,
       keyboardType: widget.inputType,
       cursorColor: Theme.of(context).primaryColor,
@@ -77,11 +81,17 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
       //onChanged: widget.isSearch ? widget.languageProvider.searchLanguage : null,
       obscureText: widget.isPassword ? _obscureText : false,
       inputFormatters: widget.inputType == TextInputType.phone
-          ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9+]'))]
+          ? <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp('[0-9+]')),
+            ]
           : widget.inputType == TextInputType.datetime
-          ? [DateInputFormatter()]: null,
+          ? [DateInputFormatter()]
+          : null,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 22),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 22,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
           borderSide: const BorderSide(style: BorderStyle.none, width: 0),
@@ -94,27 +104,39 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
           color: Theme.of(context).hintColor,
         ),
         filled: true,
-        prefixIcon: widget.isShowPrefixIcon ? Padding(
-          padding: const EdgeInsets.only(left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeSmall),
-          child: Image.asset(widget.prefixIconUrl!),
-        ) : const SizedBox.shrink(),
-        prefixIconConstraints: const BoxConstraints(minWidth: 23, maxHeight: 20),
+        prefixIcon: widget.isShowPrefixIcon
+            ? Padding(
+                padding: const EdgeInsets.only(
+                  left: Dimensions.paddingSizeLarge,
+                  right: Dimensions.paddingSizeSmall,
+                ),
+                child: Image.asset(widget.prefixIconUrl!),
+              )
+            : const SizedBox.shrink(),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 23,
+          maxHeight: 20,
+        ),
         suffixIcon: widget.isShowSuffixIcon
             ? widget.isPassword
-                ? IconButton(
-                    icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).hintColor.withOpacity(0.3)),
-                    onPressed: _toggle)
-                : widget.isIcon
-                    ? IconButton(
-                        onPressed: widget.onSuffixTap as void Function()?,
-                        icon: Image.asset(
-                          widget.suffixIconUrl!,
-                          width: 15,
-                          height: 15,
-                          color: Theme.of(context).textTheme.bodyLarge!.color,
-                        ),
-                      )
-                    : null
+                  ? IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: Theme.of(context).hintColor.withOpacity(0.3),
+                      ),
+                      onPressed: _toggle,
+                    )
+                  : widget.isIcon
+                  ? IconButton(
+                      onPressed: widget.onSuffixTap as void Function()?,
+                      icon: Image.asset(
+                        widget.suffixIconUrl!,
+                        width: 15,
+                        height: 15,
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                      ),
+                    )
+                  : null
             : null,
       ),
       onTap: widget.onTap as void Function()?,

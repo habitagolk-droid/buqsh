@@ -4,8 +4,9 @@ import 'package:six_cash/common/widgets/custom_button_widget.dart';
 import 'package:six_cash/theme/light_theme.dart';
 
 void main() {
-  testWidgets('BUQSH primary button renders with the shared theme',
-      (WidgetTester tester) async {
+  testWidgets('BUQSH primary button renders with the shared theme', (
+    WidgetTester tester,
+  ) async {
     var tapped = false;
 
     await tester.pumpWidget(
