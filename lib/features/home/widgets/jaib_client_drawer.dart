@@ -102,52 +102,40 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
   Widget _header() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 16, 16),
+      height: 236,
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
       decoration: const BoxDecoration(
         gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_secondary, _primary, _primaryDark]),
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20), bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(28)),
       ),
-      child: Column(
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 57,
-                height: 57,
-                padding: const EdgeInsets.all(2.5),
-                decoration: const BoxDecoration(color: _lime, shape: BoxShape.circle),
-                child: CircleAvatar(backgroundColor: _primary, backgroundImage: AssetImage(Images.avatar)),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Positioned(top: 0, left: 0, child: _headerButton(Icons.close_rounded, () => Get.back())),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Text('أحمد الحداد', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-                    SizedBox(height: 2),
-                    Text('•• 4582', textDirection: TextDirection.ltr, style: TextStyle(color: Colors.white, fontSize: 11)),
-                    Text('+967 777 123 456', textDirection: TextDirection.ltr, style: TextStyle(color: Colors.white, fontSize: 11)),
-                    SizedBox(height: 4),
-                    Row(children: [Icon(Icons.verified_rounded, color: _lime, size: 13), SizedBox(width: 3), DecoratedBox(decoration: BoxDecoration(color: _lime, borderRadius: BorderRadius.all(Radius.circular(5))), child: Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2), child: Text('توثيق', style: TextStyle(color: _primary, fontSize: 10, fontWeight: FontWeight.w800))))]),
+                    Container(
+                      width: 72,
+                      height: 72,
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(color: _lime, shape: BoxShape.circle),
+                      child: CircleAvatar(backgroundColor: _primary, backgroundImage: AssetImage(Images.avatar)),
+                    ),
+                    Positioned(right: -6, bottom: -4, child: InkWell(onTap: _showQr, borderRadius: BorderRadius.circular(8), child: Container(width: 30, height: 30, decoration: BoxDecoration(color: _lime, borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.qr_code_rounded, color: _primary, size: 21)))),
                   ],
                 ),
-              ),
-              Column(
-                children: [
-                  _headerButton(Icons.qr_code_rounded, _showQr),
-                  const SizedBox(height: 6),
-                  _headerButton(Icons.close_rounded, () => Get.back()),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _ghostButton(Icons.edit_outlined, 'تعديل الملف', () => _go(RouteHelper.getEditProfileRoute()))),
-              const SizedBox(width: 8),
-              Expanded(child: _ghostButton(Icons.qr_code_rounded, 'رمز QR', _showQr)),
-            ],
+                const SizedBox(height: 14),
+                const Text('Mhros Lut f mohhammed al', textDirection: TextDirection.ltr, style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 5),
+                const Text('+967 777 123 456', textDirection: TextDirection.ltr, style: TextStyle(color: Colors.white70, fontSize: 13)),
+              ],
+            ),
           ),
         ],
       ),
@@ -168,16 +156,20 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
       );
 
   Widget _group(String title, List<Widget> items) {
-    final dark = JaibAuthSettings.darkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(padding: const EdgeInsets.fromLTRB(6, 8, 6, 5), child: Container(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4), decoration: BoxDecoration(color: _limeSoft, borderRadius: BorderRadius.circular(99)), child: Text(title, style: const TextStyle(color: _primary, fontSize: 11, fontWeight: FontWeight.w900)))),
-        Container(
-          decoration: BoxDecoration(color: dark ? const Color(0xFF293033) : Colors.white, borderRadius: BorderRadius.circular(12)),
-          child: Column(children: items),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            margin: const EdgeInsets.only(top: 10, right: 8, bottom: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: _limeSoft, borderRadius: BorderRadius.circular(99)),
+            child: Text(title, style: const TextStyle(color: _primary, fontSize: 12, fontWeight: FontWeight.w900)),
+          ),
         ),
-        const Divider(height: 8, color: Color(0xFFEEF1F4)),
+        Column(children: items),
+        const Divider(height: 12, indent: 12, endIndent: 12, color: Color(0xFFEEF1F4)),
       ],
     );
   }
@@ -185,11 +177,12 @@ class _JaibClientDrawerState extends State<JaibClientDrawer> {
   Widget _item(IconData icon, String title, VoidCallback onTap, {String? badge, bool? toggle, bool danger = false, bool progress = false, Widget? trailing}) {
     final Widget? itemTrailing = trailing ?? _buildTrailing(toggle, badge, onTap);
     return ListTile(
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      dense: false,
+      minVerticalPadding: 8,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       onTap: onTap,
-      leading: Icon(icon, color: danger ? const Color(0xFFB3261E) : _primary, size: 19),
-      title: Text(title, style: TextStyle(color: danger ? const Color(0xFFB3261E) : _darkText, fontSize: 13, fontWeight: FontWeight.w700)),
+      leading: Icon(icon, color: danger ? const Color(0xFFB3261E) : _darkText, size: 26),
+      title: Text(title, style: TextStyle(color: danger ? const Color(0xFFB3261E) : _darkText, fontSize: 16, fontWeight: FontWeight.w600)),
       subtitle: progress ? ClipRRect(borderRadius: BorderRadius.circular(99), child: const LinearProgressIndicator(value: .64, minHeight: 5, backgroundColor: Color(0xFFE7ECEA), valueColor: AlwaysStoppedAnimation(_secondary))) : null,
       trailing: itemTrailing,
     );
