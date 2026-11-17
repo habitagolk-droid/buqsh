@@ -223,6 +223,7 @@ void main() {
     (tester) async {
       repo
         ..cashierToken = 'expired-cashier-token'
+        ..activeRole = 'cashier'
         ..infoResponse = const Response(
           statusCode: 401,
           body: {'message': 'expired'},
@@ -248,6 +249,7 @@ void main() {
   ) async {
     repo
       ..cashierToken = 'cashier-token'
+      ..activeRole = 'cashier'
       ..infoResponse = const Response(statusCode: 1);
     final controller = await createController(tester);
 
@@ -255,6 +257,48 @@ void main() {
 
     expect(repo.cashierToken, 'cashier-token');
     expect(repo.customerToken, 'customer-token');
+    expect(controller.isSessionReady, isFalse);
+    expect(Get.currentRoute, RouteHelper.cashierLogin);
+  });
+
+  testWidgets('does not restore cashier session when a customer is active', (
+    tester,
+  ) async {
+    repo
+      ..cashierToken = 'stale-cashier-token'
+      ..customerToken = 'customer-token'
+      ..activeRole = 'customer';
+    final controller = await createController(tester);
+
+    await controller.restoreSession();
+    await tester.pumpAndSettle();
+
+    expect(repo.infoCallCount, 0);
+    expect(repo.cashierToken, 'stale-cashier-token');
+    expect(controller.isSessionReady, isFalse);
+    expect(Get.currentRoute, RouteHelper.cashierLogin);
+  });
+
+  testWidgets('role switch invalidates an in-flight cashier restore', (
+    tester,
+  ) async {
+    repo
+      ..cashierToken = 'cashier-token'
+      ..activeRole = 'cashier';
+    final controller = await createController(tester);
+    final completer = Completer<Response>();
+    repo.infoCompleter = completer;
+
+    final restore = controller.restoreSession();
+    await tester.pump();
+    await controller.clearSessionForRoleSwitch();
+    completer.complete(
+      const Response(statusCode: 200, body: {'branch': 'North'}),
+    );
+    await restore;
+    await tester.pumpAndSettle();
+
+    expect(repo.cashierToken, isNull);
     expect(controller.isSessionReady, isFalse);
     expect(Get.currentRoute, RouteHelper.cashierLogin);
   });
@@ -349,6 +393,7 @@ void main() {
 class _FakeCashierAuthRepo implements CashierAuthRepo {
   String? cashierToken;
   String? customerToken;
+  String? activeRole;
   int infoCallCount = 0;
   Response loginResponse = const Response(
     statusCode: 200,
@@ -377,7 +422,13 @@ class _FakeCashierAuthRepo implements CashierAuthRepo {
   void updateApiClient(String token) {}
 
   @override
-  Future<void> saveActiveRole() async {}
+  Future<void> saveActiveRole() async {
+    activeRole = 'cashier';
+  }
+
+  @override
+  Future<bool> canRestoreSession() async =>
+      activeRole == null || activeRole == 'cashier';
 
   @override
   Future<bool> updateFcmToken(String authToken) async => true;
@@ -431,6 +482,7 @@ class _FakeCashierAuthRepo implements CashierAuthRepo {
   @override
   Future<void> removeToken() async {
     cashierToken = null;
+    if (activeRole == 'cashier') activeRole = null;
   }
 
   @override

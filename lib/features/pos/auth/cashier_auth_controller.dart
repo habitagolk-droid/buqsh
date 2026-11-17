@@ -39,6 +39,7 @@ class CashierAuthController extends GetxController {
   String? get shiftError => _shiftError;
 
   Future<void>? _restoreSessionFuture;
+  int _sessionGeneration = 0;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
@@ -111,11 +112,17 @@ class CashierAuthController extends GetxController {
   }
 
   Future<void> _restoreStoredSession() async {
+    final sessionGeneration = _sessionGeneration;
     _isLoading = true;
     _errorMessage = null;
     update();
 
     try {
+      if (!await authRepo.canRestoreSession() ||
+          sessionGeneration != _sessionGeneration) {
+        return;
+      }
+
       final token = await authRepo.getToken();
       if (token == null || token.trim().isEmpty) {
         return;
@@ -125,6 +132,11 @@ class CashierAuthController extends GetxController {
 
       if (!await _loadSessionInfo(token)) {
         _errorMessage = _sessionInfoError;
+        return;
+      }
+
+      if (sessionGeneration != _sessionGeneration ||
+          !await authRepo.canRestoreSession()) {
         return;
       }
 
@@ -295,14 +307,22 @@ class CashierAuthController extends GetxController {
     update();
   }
 
-  Future<void> logout() async {
-    await authRepo.removeToken();
+  /// Clears the cashier session when another account type signs in.
+  Future<void> clearSessionForRoleSwitch() async {
+    // Invalidate any in-flight restore request before its API response arrives.
+    _sessionGeneration++;
     _isSessionReady = false;
     _errorMessage = null;
     _sessionInfo = null;
     _sessionInfoError = null;
     _currentShift = null;
     _shiftError = null;
+    update();
+    await authRepo.removeToken();
+  }
+
+  Future<void> logout() async {
+    await clearSessionForRoleSwitch();
     Get.offAllNamed(RouteHelper.cashierLogin);
     update();
   }
