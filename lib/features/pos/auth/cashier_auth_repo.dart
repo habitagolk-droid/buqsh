@@ -219,6 +219,14 @@ class CashierAuthRepo {
     );
   }
 
+  /// Prevent a stale cashier token from taking over a customer/merchant session.
+  Future<bool> canRestoreSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    final activeRole = prefs.getString(AppConstants.activeRoleKey);
+    // A missing role is allowed for compatibility with older cashier sessions.
+    return activeRole == null || activeRole == UserRole.cashier.name;
+  }
+
   Future<void> saveSessionData(String sessionJson) {
     return _secureStorage.write(
       key: 'cashier_session_info_json',

@@ -18,6 +18,7 @@ import 'package:six_cash/common/models/signup_body_model.dart';
 import 'package:six_cash/common/models/response_model.dart';
 import 'package:six_cash/features/auth/domain/models/user_short_data_model.dart';
 import 'package:six_cash/features/auth/domain/reposotories/auth_repo.dart';
+import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/app_constants.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
@@ -414,6 +415,12 @@ class AuthController extends GetxController implements GetxService {
           : null;
       final isMerchant = user is Map && user['is_merchant'] == true;
       final role = isMerchant ? UserRole.merchant : UserRole.customer;
+
+      // Cashier login clears the customer session; do the same when switching
+      // back to a customer/merchant so an old cashier token cannot reclaim the UI.
+      if (Get.isRegistered<CashierAuthController>()) {
+        await Get.find<CashierAuthController>().clearSessionForRoleSwitch();
+      }
 
       // Detach any previous account from this device before assigning its token.
       await FcmService.clearForRole(
