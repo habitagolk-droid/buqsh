@@ -196,6 +196,8 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
           });
         }
 
+        await _showExchangeReceipt(amount, amount * rate, fromWallet, toWallet);
+
         Get.snackbar(
           'success'.tr,
           'exchange_success_message'.tr,
@@ -225,6 +227,27 @@ class _ExchangeScreenState extends State<ExchangeScreen> {
 
   bool _isSuccessful(int? statusCode) =>
       statusCode != null && statusCode >= 200 && statusCode < 300;
+
+  Future<void> _showExchangeReceipt(double amount, double result, WalletModel from, WalletModel to) async {
+    await Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Column(children: [
+          Container(width: 44, height: 44, alignment: Alignment.center, decoration: const BoxDecoration(color: Color(0xFF0C4A40), shape: BoxShape.circle), child: const Text('J', style: TextStyle(color: Color(0xFFD4E157), fontSize: 22, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 8),
+          Text('إيصال العملية', style: rubikSemiBold.copyWith(color: const Color(0xFF0C4A40), fontSize: 18)),
+        ]),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: double.infinity, padding: const EdgeInsets.all(15), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF278D5B), Color(0xFF0C4A40)]), borderRadius: BorderRadius.circular(16)), child: Column(children: [Text(CurrencyFormatter.format(result, currency: to.currencyCode), style: rubikBold.copyWith(color: Colors.white, fontSize: 22)), const SizedBox(height: 4), Text('تمت المصارفة بنجاح', style: rubikRegular.copyWith(color: const Color(0xFFD4E157), fontSize: 11))])),
+          const SizedBox(height: 12),
+          _ExchangeDetailRow(label: 'المبلغ المخصوم', value: CurrencyFormatter.format(amount, currency: from.currencyCode)),
+          _ExchangeDetailRow(label: 'المحفظة المستلمة', value: '${to.currencyName} (${to.currencyCode})'),
+          _ExchangeDetailRow(label: 'التاريخ', value: DateTime.now().toString().substring(0, 16)),
+        ]),
+        actions: [FilledButton(onPressed: () => Get.back(), style: FilledButton.styleFrom(backgroundColor: const Color(0xFF0C4A40)), child: const Text('تم'))],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

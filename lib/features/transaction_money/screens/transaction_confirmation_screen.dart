@@ -21,6 +21,7 @@ import 'package:six_cash/common/widgets/custom_pin_code_field_widget.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/common/widgets/demo_otp_hint_widget.dart';
 import 'package:six_cash/features/transaction_money/widgets/preview_amount_widget.dart';
+import 'package:six_cash/common/widgets/jaib_auth_settings.dart';
 
 import '../widgets/bottom_sheet_with_slider.dart';
 import '../widgets/for_person_widget.dart';
@@ -126,6 +127,17 @@ class TransactionConfirmationScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (JaibAuthSettings.biometricEnabled)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 18),
+                        child: Column(children: [
+                          Container(width: 68, height: 68, decoration: BoxDecoration(color: const Color(0xFFEFF7DC), shape: BoxShape.circle, border: Border.all(color: const Color(0xFFD4E157), width: 2)), child: const Icon(Icons.fingerprint_rounded, color: Color(0xFF0C4A40), size: 40)),
+                          const SizedBox(height: 8),
+                          Text('استخدم البصمة أو أدخل رمز PIN', style: rubikMedium.copyWith(color: const Color(0xFF0C4A40), fontSize: Dimensions.fontSizeSmall)),
+                        ]),
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(
                       top: Dimensions.paddingSizeExtraExtraLarge,
@@ -340,8 +352,6 @@ class _MethodFieldWidget extends StatelessWidget {
     );
   }
 }
-
-
 
 
 

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/images.dart';
+import 'package:six_cash/common/widgets/jaib_auth_settings.dart';
 
 const Color _primary = Color(0xFF0C4A40);
 const Color _primaryDark = Color(0xFF08332D);
@@ -12,13 +13,6 @@ const Color _limeSoft = Color(0x59D4E157);
 const Color _background = Color(0xFFF4F5F7);
 const Color _darkText = Color(0xFF1E1E1E);
 const Color _grey = Color(0xFF9AA2AD);
-
-/// Drawer-only settings. The existing authentication flow remains untouched.
-class JaibAuthSettings {
-  static bool biometricEnabled = true;
-  static bool twoFactorEnabled = false;
-  static bool darkMode = false;
-}
 
 class JaibClientDrawer extends StatefulWidget {
   const JaibClientDrawer({super.key});
