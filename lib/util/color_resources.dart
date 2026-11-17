@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ColorResources {
+  // BUQSH design tokens shared by legacy and redesigned feature widgets.
+  static const Color buqshPrimary = Color(0xFF0C4A40);
+  static const Color buqshSecondary = Color(0xFF278D5B);
+  static const Color buqshAccent = Color(0xFFD4E157);
+  static const Color buqshBackground = Color(0xFFF8F9FA);
+  static const Color buqshDarkSurface = Color(0xFF1A2E2A);
+
   static  Color getPrimaryColor() {
-    return Get.isDarkMode ? const Color(0xFF002931) : const Color(0xFF003E47);
+    return Get.isDarkMode ? buqshDarkSurface : buqshPrimary;
   }
   static  Color getPrimaryTextColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF003E47);
@@ -40,7 +47,7 @@ class ColorResources {
     return Get.isDarkMode ? const Color(0xFF585a5c) : const Color(0xFFF4F7FC);
   }
   static Color getBackgroundColor() {
-    return Get.isDarkMode ? const Color(0xFF343636) : const Color(0xFFFAFAFA);
+    return Get.isDarkMode ? buqshDarkSurface : buqshBackground;
   }
   static Color getBlackAndWhite() {
     return Get.isDarkMode ? const Color(0xFFFFFFFF) : const Color(0xFF606060);
@@ -158,12 +165,12 @@ class ColorResources {
   ];
 
   //
-  static Color secondaryColor = const Color(0xFFE0EC53);
-  static const Color primaryColor = Color(0xFF003E47);
+  static Color secondaryColor = buqshAccent;
+  static const Color primaryColor = buqshPrimary;
   static Color whiteColor = const Color(0xFFFFFFFF);
   static Color blackColor = const Color(0xFF000000);
-  static Color gradientColor = const Color(0xFF45A735);
-  static Color backgroundColor = const Color(0xFFE5E5E5);
+  static Color gradientColor = buqshSecondary;
+  static Color backgroundColor = buqshBackground;
   static Color balanceTextColor = const Color(0xFF2D3748);
   static Color cardOrangeColor = const Color(0xFFFFCB66);
   static Color cardPinkColor = const Color(0xFFF6BDE9);
@@ -177,8 +184,8 @@ class ColorResources {
   static Color redColor = const Color(0xFFFF0000);
   static Color errorColor = const Color(0xFFD32F2F);
   static Color phoneNumberColor = const Color(0xFF484848);
-  static Color themeLightBackgroundColor = const Color(0xFFFAFAFA);
-  static Color themeDarkBackgroundColor = const Color(0xFF343636);
+  static Color themeLightBackgroundColor = buqshBackground;
+  static Color themeDarkBackgroundColor = buqshDarkSurface;
   //other info
   //#6a6e81
 static Color genderDefaultColor = const Color(0xFFe3f3fd);

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:six_cash/util/color_resources.dart';
 ThemeData light = ThemeData(
+  useMaterial3: true,
   brightness: Brightness.light,
   fontFamily: 'Cairo',
   primaryColor: const Color(0xFF0C4A40),
   secondaryHeaderColor: const Color(0xFFD4E157),
   highlightColor: const Color(0xFF0C4A40),
+  scaffoldBackgroundColor: const Color(0xFFF8F9FA),
   cardColor: Colors.white,
   shadowColor: Colors.grey[300],
   textTheme: const TextTheme(
@@ -20,7 +21,27 @@ ThemeData light = ThemeData(
   ),
   dialogTheme: const DialogThemeData(surfaceTintColor: Colors.white),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    backgroundColor: Colors.white, selectedItemColor: ColorResources.themeLightBackgroundColor,
+    backgroundColor: Colors.white,
+    selectedItemColor: const Color(0xFF0C4A40),
+    unselectedItemColor: const Color(0xFF64748B),
+    type: BottomNavigationBarType.fixed,
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: Colors.white,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Color(0xFFD1D1D6)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Color(0xFF278D5B), width: 1.5),
+    ),
   ),
   colorScheme: ColorScheme(
     // background: const Color(0xFFf0f0f0),

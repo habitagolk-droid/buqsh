@@ -26,6 +26,8 @@ class CustomLoaderWidget extends StatefulWidget {
 
 class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTickerProviderStateMixin {
   late AnimationController controller;
+  late bool _ownsController;
+  late VoidCallback _animationListener;
   late Animation<double> animationCurve;
   late Animation<double> animationSize;
 
@@ -33,8 +35,12 @@ class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTick
   void initState() {
     super.initState();
 
+    _ownsController = widget.controller == null;
+    _animationListener = () {
+      if (mounted) setState(() {});
+    };
     controller = (widget.controller ?? AnimationController(vsync: this, duration: widget.duration))
-      ..addListener(() => setState(() {}))
+      ..addListener(_animationListener)
       ..repeat(reverse: true);
     final animation = CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic);
     animationCurve = Tween(begin: 1.0, end: 0.0).animate(animation);
@@ -43,7 +49,8 @@ class _CustomLoaderWidgetState extends State<CustomLoaderWidget> with SingleTick
 
   @override
   void dispose() {
-    controller.dispose();
+    controller.removeListener(_animationListener);
+    if (_ownsController) controller.dispose();
     super.dispose();
   }
 

@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 class AppTheme {
   const AppTheme._();
 
-  static const Color primary = Color(0xFFC8102E);
-  static const Color primaryDark = Color(0xFF8B0000);
-  static const Color secondary = Color(0xFF2E7D32);
-  static const Color accent = Color(0xFFFFD700);
-  static const Color background = Color(0xFFF5F5F5);
+  static const Color primary = Color(0xFF0C4A40);
+  static const Color primaryDark = Color(0xFF08352E);
+  static const Color secondary = Color(0xFF278D5B);
+  static const Color accent = Color(0xFFD4E157);
+  static const Color background = Color(0xFFF8F9FA);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF212121);
   static const Color textSecondary = Color(0xFF757575);
   static const Color error = Color(0xFFD32F2F);
   static const Color success = Color(0xFF388E3C);
-  static const Color warning = Color(0xFFF57C00);
+  static const Color warning = Color(0xFFF59E0B);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -56,12 +56,12 @@ class AppTheme {
     useMaterial3: true,
     fontFamily: 'Cairo',
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    scaffoldBackgroundColor: const Color(0xFF101816),
     colorScheme: const ColorScheme.dark(
       primary: primary,
       secondary: secondary,
       tertiary: accent,
-      surface: Color(0xFF1E1E1E),
+      surface: Color(0xFF1A2E2A),
       error: error,
       onPrimary: Colors.white,
       onSecondary: Colors.white,

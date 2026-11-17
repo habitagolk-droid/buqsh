@@ -118,7 +118,13 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
             : null,
       ),
       onTap: widget.onTap as void Function()?,
-      onSubmitted: (text) => widget.nextFocus != null ? FocusScope.of(context).requestFocus(widget.nextFocus) : widget.onSubmit!(text),
+      onSubmitted: (text) {
+        if (widget.nextFocus != null) {
+          FocusScope.of(context).requestFocus(widget.nextFocus);
+        } else {
+          widget.onSubmit?.call(text);
+        }
+      },
       onChanged: widget.onChanged as void Function(String)?,
     );
   }

@@ -200,8 +200,8 @@ class _TransactionBalanceInputScreenState extends State<TransactionBalanceInputS
                                     _fieldList?.addIf(!(method.inputName ?? '').contains('cvv') && method.inputType != 'date', method);
                                   });
 
-                                  _textControllers = _textControllers =  {};
-                                  _gridTextController = _gridTextController =  {};
+                                  _textControllers = {};
+                                  _gridTextController = {};
 
                                   for (var method in (_fieldList ?? [])) {
                                     _textControllers[method.inputName] = TextEditingController();
@@ -433,6 +433,7 @@ class _TransactionBalanceInputScreenState extends State<TransactionBalanceInputS
 
   void _confirmationRoute(double amount) {
     final transactionType = _transactionType;
+    final SplashController splashController = Get.find<SplashController>();
     if (transactionType == null || transactionType.isEmpty) {
       showCustomSnackBarHelper('error'.tr, isError: true);
       return;

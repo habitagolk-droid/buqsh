@@ -25,6 +25,32 @@ const rubikBold = TextStyle(
   fontWeight: FontWeight.w700,
 );
 
+// BUQSH typography scale. The legacy rubik* names remain above because they
+// are used throughout the existing feature tree.
+const buqshPageTitleStyle = TextStyle(
+  fontFamily: 'Cairo',
+  fontWeight: FontWeight.w800,
+  fontSize: 23.0,
+);
+
+const buqshCtaTextStyle = TextStyle(
+  fontFamily: 'Cairo',
+  fontWeight: FontWeight.w800,
+  fontSize: 16.0,
+);
+
+const buqshBalanceStyle = TextStyle(
+  fontFamily: 'Cairo',
+  fontWeight: FontWeight.w900,
+  fontSize: 26.0,
+);
+
+const buqshReceiptAmountStyle = TextStyle(
+  fontFamily: 'Cairo',
+  fontWeight: FontWeight.w900,
+  fontSize: 30.0,
+);
+
 // Standard unified styles per typography guidelines
 const buttonTextStyle = TextStyle(
   fontFamily: 'Cairo',
@@ -49,5 +75,4 @@ const smallLabelStyle = TextStyle(
   fontWeight: FontWeight.w500,
   fontSize: 12.0,
 );
-
 

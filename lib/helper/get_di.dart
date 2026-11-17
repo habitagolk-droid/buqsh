@@ -87,7 +87,6 @@ Future<Map<String, Map<String, String>>> init() async {
     () => AuthRepo(apiClient: Get.find(), sharedPreferences: Get.find()),
   );
   Get.lazyPut(() => ProfileRepo(apiClient: Get.find()));
-  Get.lazyPut(() => ProfileRepo(apiClient: Get.find()));
   Get.lazyPut(() => WebsiteLinkRepo(apiClient: Get.find()));
   Get.lazyPut(() => BannerRepo(apiClient: Get.find()));
   Get.lazyPut(() => AddMoneyRepo(apiClient: Get.find()));
