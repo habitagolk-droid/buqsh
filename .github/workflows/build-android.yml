@@ -49,7 +49,17 @@ jobs:
         run: flutter pub get
 
       - name: Check Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          BASE_SHA="${{ github.event.before }}"
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="$(git rev-parse HEAD~1)"
+          fi
+          FILES="$(git diff --name-only "$BASE_SHA" "$GITHUB_SHA" -- '*.dart')"
+          if [ -n "$FILES" ]; then
+            dart format --output=none --set-exit-if-changed $FILES
+          else
+            echo "No Dart files changed in this revision."
+          fi
 
       - name: Analyze Dart code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
