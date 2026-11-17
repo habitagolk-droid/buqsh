@@ -5,6 +5,7 @@ import 'package:six_cash/features/history/domain/models/transaction_model.dart';
 import 'package:six_cash/features/history/utils/transaction_formatting.dart';
 import 'package:six_cash/features/home/widgets/services_grid_widget.dart';
 import 'package:six_cash/features/home/widgets/banner_widget.dart';
+import 'package:six_cash/features/home/widgets/layered_service_icon.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/features/splash/controllers/splash_controller.dart';
@@ -33,6 +34,8 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
   bool _showAlert = true;
   bool _hideBalances = false;
   int _walletIndex = 0;
+  int _recentFilter = 0;
+  String _recentQuery = '';
 
   @override
   void dispose() {
@@ -338,23 +341,63 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     if (!Get.isRegistered<TransactionHistoryController>()) return const SizedBox.shrink();
     return GetBuilder<TransactionHistoryController>(
       builder: (controller) {
-        final items = controller.transactionList.take(3).toList();
+        final source = controller.transactionList.where((item) {
+          final title = getTransactionTitle(item.transactionType).toLowerCase();
+          final queryMatches = _recentQuery.trim().isEmpty || title.contains(_recentQuery.trim().toLowerCase());
+          final credit = (item.credit ?? 0) > 0;
+          final type = item.transactionType ?? '';
+          final filterMatches = _recentFilter == 0 || (_recentFilter == 1 && credit) || (_recentFilter == 2 && !credit) || (_recentFilter == 3 && type.contains('payment'));
+          return queryMatches && filterMatches;
+        }).toList();
+        final items = source.take(6).toList();
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton(
-                    onPressed: () => Get.toNamed(RouteHelper.history),
-                    child: Text('عرض الكل', style: rubikMedium.copyWith(color: _primary, fontSize: 12)),
-                  ),
                   Text('آخر العمليات', style: rubikBold.copyWith(color: _dark, fontSize: 18)),
+                  Row(children: [
+                    SizedBox(
+                      width: 136,
+                      height: 38,
+                      child: TextField(
+                        textDirection: TextDirection.rtl,
+                        onChanged: (value) => setState(() => _recentQuery = value),
+                        textAlign: TextAlign.right,
+                        style: rubikRegular.copyWith(fontSize: 12, color: _dark),
+                        decoration: InputDecoration(
+                          hintText: 'بحث...',
+                          hintStyle: rubikRegular.copyWith(fontSize: 11, color: Colors.grey[500]),
+                          suffixIcon: const Icon(Icons.search_rounded, size: 18),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(99), borderSide: BorderSide.none),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () => Get.toNamed(RouteHelper.history),
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
+                      child: Text('الكل', style: rubikMedium.copyWith(color: Colors.grey[600], fontSize: 12)),
+                    ),
+                  ]),
                 ],
               ),
             ),
+            SizedBox(
+              height: 34,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(children: [_recentFilterChip('الكل', 0), _recentFilterChip('وارد', 1), _recentFilterChip('صادر', 2), _recentFilterChip('فواتير', 3)]),
+              ),
+            ),
+            const SizedBox(height: 8),
             if (items.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -373,10 +416,30 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     );
   }
 
+  Widget _recentFilterChip(String label, int index) {
+    final selected = _recentFilter == index;
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) => setState(() => _recentFilter = index),
+        labelStyle: rubikMedium.copyWith(color: selected ? Colors.white : Colors.grey[700], fontSize: 11),
+        selectedColor: const Color(0xFF1E1E1E),
+        backgroundColor: Colors.white,
+        side: BorderSide.none,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        visualDensity: VisualDensity.compact,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99)),
+      ),
+    );
+  }
+
   Widget _buildTransactionCard(Transactions item) {
     final credit = (item.credit ?? 0) > 0;
     final amount = item.formatAmount();
     final title = getTransactionTitle(item.transactionType);
+    final pending = (item.transactionType ?? '').toLowerCase().contains('pending');
     return Container(
       height: 72,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -386,33 +449,41 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
+        textDirection: TextDirection.rtl,
         children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: credit ? const Color(0xFFE4F3EA) : const Color(0xFFF2F6D8), shape: BoxShape.circle),
+            child: LayeredServiceIcon(kind: credit ? 0 : 1, small: true),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: rubikBold.copyWith(color: _dark, fontSize: 14)),
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.right, style: rubikBold.copyWith(color: _dark, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text(formatTransactionDate(item.createdAt), maxLines: 1, overflow: TextOverflow.ellipsis, style: rubikRegular.copyWith(color: Colors.grey[600], fontSize: 11)),
+                Text(formatTransactionDate(item.createdAt), maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.right, style: rubikRegular.copyWith(color: Colors.grey[600], fontSize: 11)),
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(color: _soft, shape: BoxShape.circle),
-            child: Icon(credit ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded, size: 20, color: credit ? _primary : _dark),
-          ),
-          const SizedBox(width: 8),
           Flexible(
-            child: Text(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
               '${credit ? '+' : '-'} $amount',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.end,
+              textAlign: TextAlign.left,
               style: rubikBold.copyWith(color: credit ? _primary : _dark, fontSize: 14),
+                ),
+                const SizedBox(height: 3),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: (pending ? const Color(0xFFD4E157) : _primary).withOpacity(.18), borderRadius: BorderRadius.circular(20)), child: Text(pending ? 'قيد التنفيذ' : 'ناجح', style: rubikMedium.copyWith(fontSize: 10, color: pending ? _dark : _primary))),
+              ],
             ),
           ),
         ],

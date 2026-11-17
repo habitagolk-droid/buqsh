@@ -162,7 +162,7 @@ class _JaibWalletCarouselState extends State<JaibWalletCarousel> {
             Text(_walletName(index, wallet), style: rubikBold.copyWith(color: foreground, fontSize: 18)),
           ]),
           const SizedBox(height: 8),
-          Text(_showBalance ? _amount(index, wallet) : '••••••', textAlign: TextAlign.center, style: rubikBold.copyWith(color: foreground, fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(_showBalance ? _amount(index, wallet) : '••••••', textAlign: TextAlign.center, style: rubikBold.copyWith(color: isDollar ? _walletLime : foreground, fontSize: 22, fontWeight: FontWeight.w900)),
           const Spacer(),
           Center(child: Text(code, style: TextStyle(color: foreground, fontSize: 13, fontWeight: FontWeight.w800))),
           const Spacer(),
