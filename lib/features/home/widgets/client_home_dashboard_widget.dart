@@ -7,6 +7,7 @@ import 'package:six_cash/features/home/widgets/services_grid_widget.dart';
 import 'package:six_cash/features/home/widgets/banner_widget.dart';
 import 'package:six_cash/features/home/widgets/layered_service_icon.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
+import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/features/splash/controllers/splash_controller.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
@@ -14,7 +15,8 @@ import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/styles.dart';
 
 class ClientHomeDashboardWidget extends StatefulWidget {
-  const ClientHomeDashboardWidget({Key? key}) : super(key: key);
+  final bool cashierMode;
+  const ClientHomeDashboardWidget({Key? key, this.cashierMode = false}) : super(key: key);
 
   @override
   State<ClientHomeDashboardWidget> createState() =>
@@ -171,6 +173,50 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     );
   }
 
+  Widget _buildCashierWalletSection() {
+    if (!Get.isRegistered<CashierWalletController>()) return const SizedBox.shrink();
+    return GetBuilder<CashierWalletController>(
+      builder: (controller) {
+        final wallets = controller.displayWallets;
+        if (controller.isLoading && wallets.isEmpty) {
+          return const SizedBox(height: 230, child: Center(child: CircularProgressIndicator(color: _primary)));
+        }
+        if (wallets.isEmpty) {
+          return Container(
+            height: 120,
+            margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            child: Row(children: [
+              const Icon(Icons.account_balance_wallet_outlined, color: _primary),
+              const SizedBox(width: 10),
+              Expanded(child: Text(controller.errorMessage ?? 'تعذر تحميل محافظ الكاشير', style: rubikRegular.copyWith(color: _dark, fontSize: 13))),
+              IconButton(onPressed: () => controller.fetchCashierWallets(), icon: const Icon(Icons.refresh_rounded, color: _primary)),
+            ]),
+          );
+        }
+        return Column(children: [
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 200,
+            child: PageView.builder(
+              controller: _walletPageController,
+              itemCount: wallets.length,
+              onPageChanged: (index) { setState(() => _walletIndex = index); controller.selectCashierWallet(wallets[index]); },
+              itemBuilder: (context, index) => _buildWalletCard(wallets[index], index),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(wallets.length, (index) => AnimatedContainer(
+            duration: const Duration(milliseconds: 180), margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: index == _walletIndex ? 16 : 6, height: 6,
+            decoration: BoxDecoration(color: index == _walletIndex ? _primary : Colors.grey[400], borderRadius: BorderRadius.circular(6)),
+          ))),
+        ]);
+      },
+    );
+  }
+
   Widget _buildWalletCard(WalletModel wallet, int index) {
     final balance = wallet.currentBalance
         .toStringAsFixed(2)
@@ -292,8 +338,10 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
   Widget _buildRestoredBanner() {
     return GetBuilder<SplashController>(
       builder: (splashController) {
-        final bannerEnabled =
-            splashController.configModel?.systemFeature?.bannerStatus ?? false;
+        // Customer banners are not requested with a cashier token. Keep the
+        // same visual slot until a cashier banner source is provided.
+        final bannerEnabled = !widget.cashierMode &&
+            (splashController.configModel?.systemFeature?.bannerStatus ?? false);
         if (bannerEnabled) return const BannerWidget();
         return Container(
           height: 120,
@@ -338,7 +386,9 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
   }
 
   Widget _buildTransactionsSection() {
-    if (!Get.isRegistered<TransactionHistoryController>()) return const SizedBox.shrink();
+    // Do not render customer transaction data for a cashier session. The
+    // cashier history remains available through its dedicated screen/API.
+    if (widget.cashierMode || !Get.isRegistered<TransactionHistoryController>()) return const SizedBox.shrink();
     return GetBuilder<TransactionHistoryController>(
       builder: (controller) {
         final source = controller.transactionList.where((item) {

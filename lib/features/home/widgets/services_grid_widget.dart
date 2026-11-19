@@ -44,31 +44,31 @@ class ServicesGridWidget extends StatelessWidget {
       icon == Icons.point_of_sale_outlined ||
       icon == Icons.receipt_long_outlined;
 
-  List<_ServiceItem> _getServices() {
+  List<_ServiceItem> _getServices(BuildContext context, {bool isCashier = false}) {
     return [
       // 1. svc_transfer
       _ServiceItem(
         key: 'svc_transfer',
         icon: Icons.swap_horiz_outlined,
-        onTap: () => Get.toNamed(RouteHelper.walletTransfer),
+        onTap: isCashier ? () => showCustomSnackBarHelper('coming_soon'.tr) : () => Get.toNamed(RouteHelper.walletTransfer),
       ),
       // 2. svc_local_remit
       _ServiceItem(
         key: 'svc_local_remit',
         icon: Icons.send_outlined,
-        onTap: () => Get.toNamed(RouteHelper.sendMoney),
+        onTap: isCashier ? () => showCustomSnackBarHelper('coming_soon'.tr) : () => Get.toNamed(RouteHelper.sendMoney),
       ),
       // 3. svc_topup
       _ServiceItem(
         key: 'svc_topup',
         icon: Icons.add_circle_outline,
-        onTap: () => Get.toNamed(RouteHelper.addMoney),
+        onTap: isCashier ? () => Get.toNamed(RouteHelper.posPayment) : () => Get.toNamed(RouteHelper.addMoney),
       ),
       // 4. svc_withdraw
       _ServiceItem(
         key: 'svc_withdraw',
         icon: Icons.arrow_circle_down_outlined,
-        onTap: () => Get.toNamed(RouteHelper.withdrawServices),
+        onTap: isCashier ? () => showCustomSnackBarHelper('coming_soon'.tr) : () => Get.toNamed(RouteHelper.withdrawServices),
       ),
       // 5. svc_pos
       _ServiceItem(
@@ -331,7 +331,7 @@ class ServicesGridWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCashier = Get.find<CashierAuthController>().isSessionReady;
-    final services = isCashier ? _getCashierServices(context) : _getServices();
+    final services = _getServices(context, isCashier: isCashier);
 
     return Container(
       color: _colorScreenBg,
@@ -381,7 +381,8 @@ class ServicesGridWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             isCashier
-                                ? Container(
+                                ? LayeredServiceIcon(kind: index, small: true)
+                                /* Container(
                                     width: 48,
                                     height: 48,
                                     decoration: const BoxDecoration(
@@ -393,7 +394,7 @@ class ServicesGridWidget extends StatelessWidget {
                                       size: 28,
                                       color: _colorSecondary,
                                     ),
-                                  )
+                                  ) */
                                 : LayeredServiceIcon(kind: index, small: true),
                             const SizedBox(height: 8),
                             Text(

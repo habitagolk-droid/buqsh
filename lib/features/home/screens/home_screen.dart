@@ -19,7 +19,6 @@ import 'package:six_cash/features/home/widgets/linked_website_widget.dart';
 import 'package:six_cash/features/home/widgets/theme_two_widget.dart';
 import 'package:six_cash/features/home/widgets/theme_three_widget.dart';
 import 'package:six_cash/features/home/widgets/client_home_dashboard_widget.dart';
-import 'package:six_cash/features/wallet/widgets/multi_wallet_cards_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/controllers/cashier_wallet_controller.dart';
@@ -37,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (Get.find<CashierAuthController>().isSessionReady) {
-      await Get.find<BannerController>().getBannerList(reload);
       if (Get.isRegistered<CashierWalletController>()) {
         await Get.find<CashierWalletController>().fetchCashierWallets(
           showLoading: true,
@@ -99,17 +97,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         splashController.configModel!.themeIndex ?? 1;
                     return Column(
                       children: [
-                        isCashier
-                            ? ThemeOneWidget(showWalletCards: false)
-                            : themeIndex == 1
-                            ? const ClientHomeDashboardWidget()
+                        (isCashier || themeIndex == 1)
+                            ? ClientHomeDashboardWidget(cashierMode: isCashier)
                             : themeIndex == 2
                             ? const ThemeTwoWidget()
                             : themeIndex == 3
                             ? const ThemeThreeWidget()
                             : const ThemeOneWidget(),
 
-                        if (isCashier) const MultiWalletCardsWidget(),
 
                         const SizedBox(height: Dimensions.paddingSizeDefault),
 
