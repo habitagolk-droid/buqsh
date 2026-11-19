@@ -8,6 +8,7 @@ import 'package:six_cash/features/pos/auth/cashier_session_info.dart';
 import 'package:six_cash/features/pos/screens/cashier_home_screen.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/services/fcm_service.dart';
+import 'package:six_cash/services/token_storage.dart';
 
 class CashierAuthController extends GetxController {
   final CashierAuthRepo authRepo;
@@ -58,7 +59,6 @@ class CashierAuthController extends GetxController {
     update();
 
     try {
-      await authRepo.clearCustomerSession();
       await authRepo.removeToken();
       final loginResponse = await authRepo.login(
         username: username,
@@ -116,6 +116,11 @@ class CashierAuthController extends GetxController {
     update();
 
     try {
+      final activeRole = await TokenStorage.getStoredActiveRole();
+      if (activeRole != UserRole.cashier) {
+        deactivateSession();
+        return;
+      }
       final token = await authRepo.getToken();
       if (token == null || token.trim().isEmpty) {
         return;
@@ -292,6 +297,8 @@ class CashierAuthController extends GetxController {
     _isSessionReady = false;
     _sessionInfo = null;
     _sessionInfoError = null;
+    _currentShift = null;
+    _shiftError = null;
     update();
   }
 
@@ -303,7 +310,8 @@ class CashierAuthController extends GetxController {
     _sessionInfoError = null;
     _currentShift = null;
     _shiftError = null;
-    Get.offAllNamed(RouteHelper.cashierLogin);
+    // Keep any customer session intact and return to role selection.
+    Get.offAllNamed(RouteHelper.choseLoginOrRegScreen);
     update();
   }
 

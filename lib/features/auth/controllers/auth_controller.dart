@@ -23,6 +23,7 @@ import 'package:six_cash/util/app_constants.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/services/fcm_service.dart';
 import 'package:six_cash/services/token_storage.dart';
+import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 
 class AuthController extends GetxController implements GetxService {
   final AuthRepo authRepo;
@@ -434,6 +435,14 @@ class AuthController extends GetxController implements GetxService {
       // إغلاق أي Snackbar مفتوح لتفادي ظهور أي شريط سابق
       if (Get.isSnackbarOpen) {
         Get.closeCurrentSnackbar();
+      }
+
+      // The cashier token is stored separately, but the cashier controller is
+      // permanent in GetX. Clear only its in-memory state so a customer login
+      // cannot reuse a previous cashier shell while preserving the cashier's
+      // independent persisted session.
+      if (Get.isRegistered<CashierAuthController>()) {
+        Get.find<CashierAuthController>().deactivateSession();
       }
 
       // الانتقال الفوري للشاشة الرئيسية ومسح الشاشات السابقة

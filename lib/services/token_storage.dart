@@ -53,4 +53,17 @@ class TokenStorage {
     }
     return null;
   }
+
+  /// Returns only the explicitly selected role. This is intentionally
+  /// different from [getActiveRole], which has a legacy-token fallback.
+  /// Navigation must not infer a cashier session merely because an old
+  /// cashier token still exists on the device.
+  static Future<UserRole?> getStoredActiveRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    final activeRole = prefs.getString('active_role');
+    for (final role in UserRole.values) {
+      if (role.name == activeRole) return role;
+    }
+    return null;
+  }
 }

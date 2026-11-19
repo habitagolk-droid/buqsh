@@ -10,6 +10,8 @@ import 'package:six_cash/util/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
+import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
+import 'package:six_cash/services/token_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -58,6 +60,17 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       if (value.isOk) {
         await Future.delayed(const Duration(seconds: 1));
         await Get.find<SplashController>().initSharedData();
+
+        // Restore the cashier shell only when the explicitly selected role is
+        // cashier. A persisted cashier token alone must never override a
+        // customer session.
+        final activeRole = await TokenStorage.getStoredActiveRole();
+        if (activeRole == UserRole.cashier &&
+            await TokenStorage.getAuthToken(UserRole.cashier) != null) {
+          final cashier = Get.find<CashierAuthController>();
+          await cashier.restoreSession();
+          if (cashier.isSessionReady) return;
+        }
 
         final UserShortDataModel? userData = Get.find<AuthController>().getUserData();
 

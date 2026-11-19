@@ -13,6 +13,7 @@ import 'package:six_cash/features/pos/transactions/cashier_transactions_screen.d
 import 'package:six_cash/features/splash/screens/splash_screen.dart';
 import 'package:six_cash/helper/dialog_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
+import 'package:six_cash/services/token_storage.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
 
@@ -25,6 +26,7 @@ class NavBarScreen extends StatefulWidget {
 
 class _NavBarScreenState extends State<NavBarScreen> {
   final PageStorageBucket bucket = PageStorageBucket();
+  bool _roleChecked = false;
 
   @override
   void initState() {
@@ -32,14 +34,21 @@ class _NavBarScreenState extends State<NavBarScreen> {
     Get.find<MenuItemController>().selectHomePage(isUpdate: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final cashierController = Get.find<CashierAuthController>();
-      if (!cashierController.isSessionReady) {
+      final activeRole = await TokenStorage.getStoredActiveRole();
+      if (activeRole == UserRole.cashier &&
+          !cashierController.isSessionReady) {
         await cashierController.restoreSession();
+      } else if (activeRole != UserRole.cashier &&
+          cashierController.isSessionReady) {
+        // A customer login must immediately detach any in-memory cashier UI.
+        cashierController.deactivateSession();
       }
       if (!mounted) return;
       if (!cashierController.isSessionReady &&
           Get.isRegistered<AuthController>()) {
         Get.find<AuthController>().checkBiometricWithPin();
       }
+      if (mounted) setState(() => _roleChecked = true);
     });
   }
 
@@ -50,7 +59,13 @@ class _NavBarScreenState extends State<NavBarScreen> {
       onPopInvoked: (_) => _onWillPop(context),
       child: GetBuilder<CashierAuthController>(
         builder: (cashierController) {
-          final isCashier = cashierController.isSessionReady;
+          // Do not render a stale cashier tree during the async role check.
+          final isCashier = _roleChecked && cashierController.isSessionReady;
+          if (!_roleChecked) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
           return GetBuilder<MenuItemController>(
             builder: (menuController) {
               return Scaffold(
@@ -133,7 +148,11 @@ class _NavBarScreenState extends State<NavBarScreen> {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0C4A40), Color(0xFF278D5B)],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
@@ -144,8 +163,12 @@ class _NavBarScreenState extends State<NavBarScreen> {
                 children: [
                   CircleAvatar(
                     radius: 27,
-                    backgroundColor: Colors.white.withOpacity(0.16),
-                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 30),
+                    backgroundColor: const Color(0xFFD4E157),
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Color(0xFF0C4A40),
+                      child: Icon(Icons.point_of_sale_rounded, color: Colors.white, size: 28),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
