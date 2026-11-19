@@ -14,10 +14,7 @@ import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/features/home/widgets/home_app_bar_widget.dart';
 import 'package:six_cash/features/home/widgets/bottomsheet_content_widget.dart';
 import 'package:six_cash/features/home/widgets/persistent_header_widget.dart';
-import 'package:six_cash/features/home/widgets/theme_one_widget.dart';
 import 'package:six_cash/features/home/widgets/linked_website_widget.dart';
-import 'package:six_cash/features/home/widgets/theme_two_widget.dart';
-import 'package:six_cash/features/home/widgets/theme_three_widget.dart';
 import 'package:six_cash/features/home/widgets/client_home_dashboard_widget.dart';
 import 'package:six_cash/features/wallet/controllers/wallet_controller.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
@@ -91,28 +88,15 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.only(bottom: 120),
-                child: GetBuilder<SplashController>(
-                  builder: (splashController) {
-                    int themeIndex =
-                        splashController.configModel!.themeIndex ?? 1;
-                    return Column(
-                      children: [
-                        (isCashier || themeIndex == 1)
-                            ? ClientHomeDashboardWidget(cashierMode: isCashier)
-                            : themeIndex == 2
-                            ? const ThemeTwoWidget()
-                            : themeIndex == 3
-                            ? const ThemeThreeWidget()
-                            : const ThemeOneWidget(),
-
-
-                        const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                        if (!isCashier) const LinkedWebsiteWidget(),
-                        const SizedBox(height: 80),
-                      ],
-                    );
-                  },
+                child: Column(
+                  children: [
+                    // UI4Code dashboard is the live home surface for both
+                    // roles. Backend theme selection must not bypass it.
+                    ClientHomeDashboardWidget(cashierMode: isCashier),
+                    const SizedBox(height: Dimensions.paddingSizeDefault),
+                    if (!isCashier) const LinkedWebsiteWidget(),
+                    const SizedBox(height: 80),
+                  ],
                 ),
               ),
             ),
