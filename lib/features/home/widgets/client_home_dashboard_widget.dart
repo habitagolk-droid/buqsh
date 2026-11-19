@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get.dart';
+import 'package:get/get.dart';
 import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/history/controllers/transaction_history_controller.dart';
 import 'package:six_cash/features/history/domain/models/transaction_model.dart';

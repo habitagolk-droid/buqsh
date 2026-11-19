@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get.dart';
+import 'package:get/get.dart';
 import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/helper/route_helper.dart';
