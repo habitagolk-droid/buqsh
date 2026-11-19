@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/history/controllers/transaction_history_controller.dart';
 import 'package:six_cash/features/history/domain/models/transaction_model.dart';
 import 'package:six_cash/features/history/utils/transaction_formatting.dart';
@@ -24,7 +25,7 @@ class ClientHomeDashboardWidget extends StatefulWidget {
 class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
   static const _primary = Color(0xFF278D5B);
   static const _dark = Color(0xFF0A3A2A);
-  static const _background = Color(0xFFF4F5F7);
+  static const _background = BqColors.bg;
   static const _soft = Color(0xFFF0F1F4);
   static const _alert = Color(0xFFE8F5E9);
 
@@ -175,28 +176,17 @@ class _ClientHomeDashboardWidgetState extends State<ClientHomeDashboardWidget> {
     final balance = wallet.currentBalance
         .toStringAsFixed(2)
         .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
-    final isLightCard = index == 2 || wallet.currencyCode.toUpperCase() == 'USD';
-    final foreground = isLightCard ? _dark : Colors.white;
-    final accent = index == 1 ? const Color(0xFFD4E157) : (isLightCard ? _primary : Colors.white);
-    final gradient = index == 1
-        ? const [Color(0xFF1E1E1E), _dark]
-        : isLightCard
-            ? const [Colors.white, Color(0xFFE8F5E9)]
-            : const [_primary, _dark];
+    final code = wallet.currencyCode.trim().toUpperCase();
+    final foreground = Colors.white;
+    final accent = BqColors.accent;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Container(
         width: 320,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: gradient,
-          ),
-          boxShadow: const [
-            BoxShadow(color: Color(0x180A3A2A), blurRadius: 12, offset: Offset(0, 5)),
-          ],
+        borderRadius: BorderRadius.circular(BqRadius.card),
+          gradient: BqWalletGradient.forCurrency(code),
+          boxShadow: BqShadows.card,
         ),
         padding: const EdgeInsets.all(20),
         child: Column(

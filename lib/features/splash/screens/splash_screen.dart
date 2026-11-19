@@ -9,6 +9,7 @@ import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -83,12 +84,23 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(Images.logo, height: 175),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: BqGradients.header),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 112,
+                height: 112,
+                padding: const EdgeInsets.all(18),
+                decoration: const BoxDecoration(color: BqColors.accent, shape: BoxShape.circle),
+                child: Image.asset(Images.logo),
+              ),
+              const SizedBox(height: 18),
+              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+            ],
+          ),
         ),
       ),
     );

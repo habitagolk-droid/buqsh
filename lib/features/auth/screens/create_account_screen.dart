@@ -12,6 +12,7 @@ import 'package:six_cash/common/widgets/custom_large_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({Key? key}) : super(key: key);
@@ -33,7 +34,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: BqColors.bg,
       appBar: CustomAppbarWidget(title: 'login_registration'.tr),
       body: Column(crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -42,7 +43,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: Dimensions.paddingSizeExtraExtraLarge),
-                  const CustomLogoWidget(height: 70.0, width: 70.0),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: const BoxDecoration(color: BqColors.accent, shape: BoxShape.circle),
+                    child: const CustomLogoWidget(height: 70.0, width: 70.0),
+                  ),
                   const SizedBox(height: Dimensions.paddingSizeExtraLarge),
                   Padding(padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
                     child: Text('${'create'.tr} ${AppConstants.appName} ${'account_with_your'.tr}', style: rubikRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeLarge,), textAlign: TextAlign.center,),
@@ -50,7 +55,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   const SizedBox(height: Dimensions.paddingSizeExtraLarge,),
                   GetBuilder<CreateAccountController>(builder: (controller)=>Container(height: 52,
                     margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                    child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(color: BqColors.input, borderRadius: BorderRadius.circular(BqRadius.card)),
                       child: TextField(
                         controller: numberFieldController,
                         keyboardType: TextInputType.phone,
@@ -58,12 +64,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.only(bottom: 5),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
+                            borderRadius: BorderRadius.circular(BqRadius.card),
                             borderSide: BorderSide(color: Theme.of(context).textTheme.titleLarge!.color!, width: 2,
                             ),
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
+                            borderRadius: BorderRadius.circular(BqRadius.card),
                             borderSide: BorderSide(color: ColorResources.textFieldBorderColor, width: 1,
                             ),
                           ),

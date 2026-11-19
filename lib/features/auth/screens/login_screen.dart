@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/features/home/controllers/menu_controller.dart';
 import 'package:six_cash/features/language/controllers/localization_controller.dart';
@@ -127,21 +128,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         '';
 
     return Scaffold(
-      backgroundColor: ColorResources.getPrimaryColor(),
+      backgroundColor: BqColors.brand,
       body: GetBuilder<AuthController>(
         builder: (authController) => AbsorbPointer(
           absorbing: authController.isLoading,
           child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  ColorResources.getPrimaryColor(),
-                  ColorResources.getPrimaryColor().withValues(alpha: 0.92),
-                ],
-              ),
-            ),
+              decoration: const BoxDecoration(gradient: BqGradients.proHeader),
             child: SafeArea(
               child: Column(
                 children: [
@@ -228,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(32),
+                          top: Radius.circular(BqRadius.large),
                         ),
                       ),
                       child: SafeArea(

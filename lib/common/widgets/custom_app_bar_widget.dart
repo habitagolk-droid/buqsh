@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:six_cash/util/dimensions.dart';
-import 'package:six_cash/util/styles.dart';
 import 'package:six_cash/common/widgets/custom_ink_well_widget.dart';
 import 'package:six_cash/common/widgets/rounded_button_widget.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
+import 'package:six_cash/util/dimensions.dart';
+import 'package:six_cash/util/styles.dart';
 
 class CustomAppbarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -11,63 +12,66 @@ class CustomAppbarWidget extends StatelessWidget implements PreferredSizeWidget 
   final bool isSkip;
   final Function? function;
   final bool onlyTitle;
-  const CustomAppbarWidget({Key? key, required this.title, this.onTap,this.isSkip = false, this.function, this.onlyTitle = false}) : super(key: key);
+
+  const CustomAppbarWidget({
+    Key? key,
+    required this.title,
+    this.onTap,
+    this.isSkip = false,
+    this.function,
+    this.onlyTitle = false,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return onlyTitle ? Container(
-      color: Theme.of(context).primaryColor,
-      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(title, style: rubikSemiBold.copyWith(
-            fontSize: Dimensions.fontSizeExtraLarge,color: Colors.white,),
-          ),
-          const SizedBox(height: Dimensions.paddingSizeDefault,)
-
-        ],
-      ),
-
-    ) : Container(
-      color: Theme.of(context).primaryColor,
+    final decoration = const BoxDecoration(
+      gradient: BqGradients.header,
+      borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+    );
+    if (onlyTitle) {
+      return Container(
+        decoration: decoration,
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(title, style: rubikSemiBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge, color: Colors.white)),
+            const SizedBox(height: Dimensions.paddingSizeDefault),
+          ],
+        ),
+      );
+    }
+    return Container(
+      decoration: decoration,
       child: SafeArea(
-        child: Container(
-          color: Theme.of(context).primaryColor,
+        child: Padding(
           padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomInkWellWidget(
-                  onTap: onTap == null ? () {
-                    Get.back();
-                  } : onTap as void Function()?,
-                  radius: Dimensions.radiusSizeSmall,
-                  child: Container(
-                    height: 40,width: 40,
-                    // padding: const EdgeInsets.all(Dimensions.PADDING_SIZE_DEFAULT),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white.withOpacity(0.7), width: 0.5),
-                      borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
-                    ),
-                    child: const Center(
-                      child: Icon(Icons.arrow_back_ios_new, size: Dimensions.paddingSizeSmall, color: Colors.white,
-                      ),
-                    ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CustomInkWellWidget(
+                onTap: onTap == null ? () => Get.back() : () => onTap!(),
+                radius: Dimensions.radiusSizeSmall,
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white.withOpacity(0.7), width: 0.5),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
                   ),
+                  child: const Icon(Icons.arrow_back_ios_new, size: Dimensions.paddingSizeSmall, color: Colors.white),
                 ),
+              ),
+              const SizedBox(width: Dimensions.paddingSizeDefault),
+              Expanded(child: Text(title, textAlign: TextAlign.center, style: rubikMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge, color: Colors.white))),
+              if (isSkip) ...[
                 const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                Text(title, style: rubikMedium.copyWith(fontSize: Dimensions.fontSizeExtraLarge, color: Colors.white),
-                ),
-
-                isSkip ? const Spacer() : const SizedBox(),
-
-                isSkip ? SizedBox(child: RoundedButtonWidget(buttonText: 'skip'.tr, onTap: function, isSkip: true,)) : const SizedBox(),
-              ],
-            ),
+                SizedBox(child: RoundedButtonWidget(buttonText: 'skip'.tr, onTap: function, isSkip: true)),
+              ] else
+                const SizedBox(width: 40),
+            ],
           ),
         ),
       ),
@@ -77,5 +81,3 @@ class CustomAppbarWidget extends StatelessWidget implements PreferredSizeWidget 
   @override
   Size get preferredSize => const Size(double.maxFinite, 70);
 }
-
-

@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/onboarding/controllers/on_boarding_controller.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/app_constants.dart';
@@ -18,7 +19,7 @@ class OnBoardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: BqColors.bg,
       body: Column(children: [
         Expanded(child: Column(
           mainAxisSize: MainAxisSize.min,

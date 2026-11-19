@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/add_money/controllers/add_money_controller.dart';
 import 'package:six_cash/features/setting/controllers/profile_screen_controller.dart';
 import 'package:six_cash/features/splash/controllers/splash_controller.dart';
@@ -163,8 +164,8 @@ class _TransactionBalanceInputScreenState extends State<TransactionBalanceInputS
                               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
-                                border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.4)),
+                                borderRadius: BorderRadius.circular(BqRadius.card),
+                                border: Border.all(color: BqColors.line),
                               ),
 
                               child: DropdownButton<String>(
@@ -352,7 +353,7 @@ class _TransactionBalanceInputScreenState extends State<TransactionBalanceInputS
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusSizeDefault),
+                                borderRadius: BorderRadius.circular(BqRadius.card),
                               ),
                               elevation: 0,
                             ),

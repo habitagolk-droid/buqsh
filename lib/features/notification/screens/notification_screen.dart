@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/common/widgets/custom_app_bar_widget.dart';
 import 'package:six_cash/features/notification/controllers/notification_controller.dart';
 import 'package:six_cash/features/splash/controllers/splash_controller.dart';
@@ -47,8 +48,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
                 itemBuilder: (context, index) {
                   return Container(
-                    color: Theme.of(context).cardColor,
-                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    margin: const EdgeInsets.fromLTRB(14, 4, 14, 6),
+                    decoration: BoxDecoration(
+                      color: BqColors.surface,
+                      borderRadius: BorderRadius.circular(BqRadius.card),
+                      boxShadow: BqShadows.card,
+                    ),
                     child: CustomInkWellWidget(
                       onTap: (){
                         showDialog(context: context, builder: (context) => NotificationDialogWidget(notificationModel: notification.notificationList[index]));
@@ -57,6 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall,horizontal:  Dimensions.paddingSizeExtraLarge),
                         child: Row(
+                          textDirection: TextDirection.rtl,
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

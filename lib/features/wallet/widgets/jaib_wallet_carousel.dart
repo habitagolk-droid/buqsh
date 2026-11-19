@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/wallet/domain/models/wallet_model.dart';
 import 'package:six_cash/util/styles.dart';
 
 const Color _walletPrimary = Color(0xFF0C4A40);
 const Color _walletDark = Color(0xFF08332D);
-const Color _walletSecondary = Color(0xFF278D5B);
 const Color _walletLime = Color(0xFFD4E157);
 const Color _walletGrey = Color(0xFF9AA2AD);
 const Color _walletText = Color(0xFF1E1E1E);
@@ -54,9 +54,8 @@ class _JaibWalletCarouselState extends State<JaibWalletCarousel> {
   }
 
   String _walletCode(int index, WalletModel wallet) {
-    if (wallet.currencyCode.toUpperCase() == 'YER') return 'YER';
-    if (wallet.currencyCode.toUpperCase() == 'USD') return 'USD';
-    return index == 1 ? 'SAVINGS' : wallet.currencyCode.toUpperCase();
+    final code = wallet.currencyCode.trim().toUpperCase();
+    return code.isEmpty ? 'YER' : code;
   }
 
   String _walletName(int index, WalletModel wallet) {
@@ -65,24 +64,13 @@ class _JaibWalletCarouselState extends State<JaibWalletCarousel> {
         return 'محفظة الريال اليمني';
       case 'USD':
         return 'محفظة الدولار';
-      case 'SAVINGS':
-        return 'محفظة التوفير';
       default:
         return wallet.currencyName;
     }
   }
 
   String _walletNumber(int index, WalletModel wallet) {
-    switch (_walletCode(index, wallet)) {
-      case 'YER':
-        return '••4582';
-      case 'USD':
-        return '••9041';
-      case 'SAVINGS':
-        return '••7319';
-      default:
-        return '••${wallet.id.toString().padLeft(4, '0')}';
-    }
+    return '••${wallet.id.toString().padLeft(4, '0')}';
   }
 
   String _amount(int index, WalletModel wallet) {
@@ -137,20 +125,14 @@ class _JaibWalletCarouselState extends State<JaibWalletCarousel> {
     final isDollar = code == 'USD';
     final darkText = active && isDollar;
     final foreground = darkText ? _walletText : Colors.white;
-    final gradient = !active
-        ? const LinearGradient(colors: [Color(0xFF1E1E1E), Color(0xFF303030)])
-        : isDollar
-            ? const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white, Color(0xFFEFF4EE)])
-            : code == 'SAVINGS'
-                ? const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF2B2B2E), Colors.black])
-                : const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [_walletSecondary, _walletPrimary, _walletDark]);
+    final gradient = active ? BqWalletGradient.forCurrency(code) : const LinearGradient(colors: [Color(0xFF1E1E1E), Color(0xFF303030)]);
 
     return Container(
       width: 320,
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         gradient: gradient,
         boxShadow: const [BoxShadow(color: Color(0x42000000), blurRadius: 10, offset: Offset(0, 4))],
       ),

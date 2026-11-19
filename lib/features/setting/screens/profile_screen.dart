@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:six_cash/common/widgets/custom_app_bar_widget.dart';
 import 'package:six_cash/features/auth/controllers/auth_controller.dart';
@@ -106,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: BqColors.bg,
       appBar: CustomAppbarWidget(title: 'profile'.tr, onlyTitle: true),
       body: GetBuilder<AuthController>(builder: (authController){
         return ModalProgressHUD(
@@ -288,7 +289,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
 
 
 

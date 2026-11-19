@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 
 class ColorResources {
   static  Color getPrimaryColor() {
-    return Get.isDarkMode ? const Color(0xFF002931) : const Color(0xFF003E47);
+    return BqColors.brand;
   }
   static  Color getPrimaryTextColor() {
     return Get.isDarkMode ? const Color(0xFF8dbac3) : const Color(0xFF003E47);
   }
   static Color getSecondaryHeaderColor() {
-    return Get.isDarkMode ? const Color(0xFFaaa818) : const Color(0xFFCFEC7E);
+    return Get.isDarkMode ? BqColors.accentDark : BqColors.accent;
   }
   static Color getGreyColor() {
-    return Get.isDarkMode ? const Color(0xFF6f7275) : const Color(0xFFA0A4A8);
+    return Get.isDarkMode ? const Color(0xFFB0B7C3) : BqColors.muted;
   }
   static Color getGreyBaseGray1() {
     return Get.isDarkMode ? const Color(0xFFd3d3d8) : const Color(0xFF8E8E93);
@@ -40,7 +41,7 @@ class ColorResources {
     return Get.isDarkMode ? const Color(0xFF585a5c) : const Color(0xFFF4F7FC);
   }
   static Color getBackgroundColor() {
-    return Get.isDarkMode ? const Color(0xFF343636) : const Color(0xFFFAFAFA);
+    return Get.isDarkMode ? const Color(0xFF1B2926) : BqColors.bg;
   }
   static Color getBlackAndWhite() {
     return Get.isDarkMode ? const Color(0xFFFFFFFF) : const Color(0xFF606060);
@@ -52,7 +53,7 @@ class ColorResources {
     return Get.isDarkMode ? const Color(0xFF3c3c3c) : const Color(0xFFFFFFFF);
   }
   static Color getHintColor() {
-    return Get.isDarkMode ? const Color(0xFFB0B7C3) : const Color(0xFF4A5568);
+    return Get.isDarkMode ? const Color(0xFFB0B7C3) : BqColors.muted;
   }
   static Color getSecondaryTextColor() {
     return Get.isDarkMode ? const Color(0xFFCBD5E1) : const Color(0xFF4A5568);
@@ -159,7 +160,7 @@ class ColorResources {
 
   //
   static Color secondaryColor = const Color(0xFFE0EC53);
-  static const Color primaryColor = Color(0xFF003E47);
+  static const Color primaryColor = BqColors.brand;
   static Color whiteColor = const Color(0xFFFFFFFF);
   static Color blackColor = const Color(0xFF000000);
   static Color gradientColor = const Color(0xFF45A735);
@@ -177,7 +178,7 @@ class ColorResources {
   static Color redColor = const Color(0xFFFF0000);
   static Color errorColor = const Color(0xFFD32F2F);
   static Color phoneNumberColor = const Color(0xFF484848);
-  static Color themeLightBackgroundColor = const Color(0xFFFAFAFA);
+  static Color themeLightBackgroundColor = BqColors.bg;
   static Color themeDarkBackgroundColor = const Color(0xFF343636);
   //other info
   //#6a6e81

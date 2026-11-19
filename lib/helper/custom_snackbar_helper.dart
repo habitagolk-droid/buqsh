@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/data/api/api_checker.dart';
 import 'package:six_cash/util/dimensions.dart';
 import 'package:six_cash/util/styles.dart';
@@ -18,7 +19,7 @@ void showCustomSnackBarHelper(String? message, {bool isError = true, bool isIcon
         return Container(
           width: Get.width,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(BqRadius.card),
             color: Theme.of(Get.context!).colorScheme.error,
           ),
           child: SafeArea(child: Padding(
@@ -50,9 +51,11 @@ void showCustomSnackBarHelper(String? message, {bool isError = true, bool isIcon
         snackPosition: SnackPosition.BOTTOM,
 
         message: message,
-        duration: const Duration(seconds: 5),
+        duration: duration ?? const Duration(milliseconds: 2600),
         isDismissible: true,
-        backgroundColor:  isError ? Colors.red : Colors.green,
+        backgroundColor: isError ? BqColors.error : BqColors.success,
+        margin: const EdgeInsets.fromLTRB(14, 0, 14, 96),
+        borderRadius: BorderRadius.circular(BqRadius.pill),
 
         icon: isIcon ?  IconButton(icon: const Icon(Icons.clear,size: 16,),color: Colors.white,
             onPressed: (){

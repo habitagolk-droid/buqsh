@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/features/pos/transactions/cashier_transaction.dart';
 import 'package:six_cash/features/pos/transactions/cashier_transactions_controller.dart';
@@ -14,7 +15,7 @@ class CashierTransactionsScreen extends StatefulWidget {
 }
 
 class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
-  static const _primary = Color(0xFF086048);
+  static const _primary = BqColors.brand;
   String? _selectedType;
 
   String _amount(CashierTransaction transaction) {
@@ -114,7 +115,7 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
                 .toList();
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF7F8FA),
+          backgroundColor: BqColors.bg,
           appBar: AppBar(
             title: Text('history'.tr, style: rubikBold),
             backgroundColor: _primary,
@@ -230,9 +231,9 @@ class _CashierTransactionsScreenState extends State<CashierTransactionsScreen> {
     final statusColor = _statusColor(transaction.status);
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(BqRadius.card),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(BqRadius.card),
         onTap: () => _showDetails(context, transaction),
         child: Padding(
           padding: const EdgeInsets.all(14),

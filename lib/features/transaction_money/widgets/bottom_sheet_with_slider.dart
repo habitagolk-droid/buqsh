@@ -15,6 +15,7 @@ import 'package:six_cash/util/images.dart';
 import 'package:six_cash/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:lottie/lottie.dart';
 import 'package:six_cash/common/widgets/custom_ink_well_widget.dart';
 import 'package:slide_to_confirm/slide_to_confirm.dart';
@@ -59,10 +60,7 @@ class _BottomSheetWithSliderState extends State<BottomSheetWithSlider> {
       child: Container(
         decoration: BoxDecoration(
           color: ColorResources.getBackgroundColor(),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radiusSizeLarge),
-            topRight:Radius.circular(Dimensions.radiusSizeLarge),
-          ),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(BqRadius.sheet), topRight: Radius.circular(BqRadius.sheet)),
         ),
 
         child: GetBuilder<TransactionMoneyController>(
@@ -78,7 +76,7 @@ class _BottomSheetWithSliderState extends State<BottomSheetWithSlider> {
                       padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeLarge),
                       decoration: BoxDecoration(
                         color: ColorResources.getLightGray().withOpacity(0.8),
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(Dimensions.radiusSizeLarge) ),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(BqRadius.sheet)),
                       ),
                       child: Text('${'confirm_to'.tr} $type', style: rubikSemiBold.copyWith(),),
                     ),
@@ -248,8 +246,8 @@ class _BottomSheetWithSliderState extends State<BottomSheetWithSlider> {
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraExtraLarge),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).secondaryHeaderColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radiusSizeSmall),
+                      color: BqColors.accent,
+                      borderRadius: BorderRadius.circular(BqRadius.card),
                     ),
                     child: CustomInkWellWidget(
                       onTap: (){
@@ -280,7 +278,7 @@ class _BottomSheetWithSliderState extends State<BottomSheetWithSlider> {
                         sliderButtonContent: Container(
                           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).secondaryHeaderColor,
+                            color: BqColors.accent,
                             shape: BoxShape.circle,
                           ),
                           child: Image.asset(Images.slideRightIcon),

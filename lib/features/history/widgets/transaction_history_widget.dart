@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/history/domain/models/transaction_model.dart';
 import 'package:six_cash/features/history/utils/transaction_formatting.dart';
 import 'package:six_cash/features/home/widgets/layered_service_icon.dart';
@@ -35,8 +36,8 @@ class TransactionHistoryWidget extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 2))],
+        borderRadius: BorderRadius.circular(BqRadius.card),
+        boxShadow: BqShadows.card,
       ),
       child: Row(
         textDirection: TextDirection.rtl,
@@ -44,7 +45,7 @@ class TransactionHistoryWidget extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: const BoxDecoration(color: Color(0xFFF1F3F4), shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: BqColors.customerSoft, shape: BoxShape.circle),
             child: LayeredServiceIcon(kind: isCredit ? 0 : 1, small: true),
           ),
           const SizedBox(width: 12),

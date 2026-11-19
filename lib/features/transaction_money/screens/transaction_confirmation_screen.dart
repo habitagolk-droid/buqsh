@@ -16,6 +16,7 @@ import 'package:six_cash/util/styles.dart';
 import 'package:six_cash/common/widgets/custom_app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:six_cash/common/widgets/custom_pin_code_field_widget.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
@@ -96,7 +97,8 @@ class TransactionConfirmationScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(10))
+                      borderRadius: BorderRadius.circular(BqRadius.card),
+                      boxShadow: BqShadows.card,
                   ),
 
                   child: Column(children: [
@@ -132,9 +134,9 @@ class TransactionConfirmationScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 18),
                         child: Column(children: [
-                          Container(width: 68, height: 68, decoration: BoxDecoration(color: const Color(0xFFEFF7DC), shape: BoxShape.circle, border: Border.all(color: const Color(0xFFD4E157), width: 2)), child: const Icon(Icons.fingerprint_rounded, color: Color(0xFF0C4A40), size: 40)),
+                          Container(width: 72, height: 72, decoration: BoxDecoration(color: BqColors.input, shape: BoxShape.circle, border: Border.all(color: BqColors.accent, width: 2)), child: const Icon(Icons.fingerprint_rounded, color: BqColors.brand, size: 40)),
                           const SizedBox(height: 8),
-                          Text('استخدم البصمة أو أدخل رمز PIN', style: rubikMedium.copyWith(color: const Color(0xFF0C4A40), fontSize: Dimensions.fontSizeSmall)),
+                          Text('استخدم البصمة أو أدخل رمز PIN', style: rubikMedium.copyWith(color: BqColors.brand, fontSize: Dimensions.fontSizeSmall)),
                         ]),
                       ),
                     ),
@@ -352,7 +354,6 @@ class _MethodFieldWidget extends StatelessWidget {
     );
   }
 }
-
 
 
 

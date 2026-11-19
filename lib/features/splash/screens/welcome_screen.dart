@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/auth/controllers/auth_controller.dart';
 import 'package:six_cash/helper/route_helper.dart';
 import 'package:six_cash/util/app_constants.dart';
@@ -35,18 +36,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: BqColors.brand,
       body: Container(
         height: size.height * 0.7,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraExtraLarge),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: BqColors.surface,
           borderRadius: const BorderRadius.only(
-            bottomLeft:
-                Radius.circular(Dimensions.radiusSizeExtraExtraLarge),
-            bottomRight:
-                Radius.circular(Dimensions.radiusSizeExtraExtraLarge),
+            bottomLeft: Radius.circular(BqRadius.large),
+            bottomRight: Radius.circular(BqRadius.large),
           ),
         ),
         child: Column(

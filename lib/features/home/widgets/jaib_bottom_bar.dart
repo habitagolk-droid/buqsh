@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 
 class JaibBottomBar extends StatelessWidget {
   const JaibBottomBar({
@@ -10,15 +11,17 @@ class JaibBottomBar extends StatelessWidget {
   final int index;
   final ValueChanged<int> onTap;
 
-  static const primary = Color(0xFF0C4A40);
-  static const phosphor = Color(0xFFD4E157);
+  static const primary = BqColors.brand;
+  static const phosphor = BqColors.accent;
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
       height: 70,
       color: Colors.white,
-      elevation: 10,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
       surfaceTintColor: Colors.transparent,
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,
@@ -68,22 +71,28 @@ class BottomNavIcon extends StatelessWidget {
       child: SizedBox(
         width: 54,
         height: 70,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: selected ? FontWeight.bold : FontWeight.w500,
-                color: color,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: selected ? BqColors.customerSoft : Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 24, color: color),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                  color: color,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

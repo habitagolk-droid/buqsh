@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/setting/controllers/profile_screen_controller.dart';
 import 'package:six_cash/features/setting/domain/enums/kyc_verificaiton.dart';
 import 'package:six_cash/features/splash/controllers/splash_controller.dart';
@@ -22,11 +23,9 @@ class UserInfoWidget extends StatelessWidget {
     return  GetBuilder<ProfileController>(
       builder: (profileController) =>
       profileController.isLoading ? const ProfileShimmerWidget() : Container(
-        color: Theme.of(context).cardColor,
-        padding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.paddingSizeLarge,
-          vertical: Dimensions.paddingSizeLarge,
-        ),
+        margin: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+        padding: const EdgeInsets.all(18),
+        decoration: const BoxDecoration(gradient: BqGradients.proHeader, borderRadius: BorderRadius.all(Radius.circular(BqRadius.hero)), boxShadow: BqShadows.card),
         child: Column(
           children: [
             Row(
@@ -40,7 +39,7 @@ class UserInfoWidget extends StatelessWidget {
                       height: Dimensions.radiusSizeOverLarge,
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusProfileAvatar)),
-                        border: Border.all(width: 1, color: Theme.of(context).highlightColor),
+                        border: Border.all(width: 2, color: BqColors.accent),
                       ),
                       child: ClipRRect(
                         borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusProfileAvatar)),
@@ -63,7 +62,7 @@ class UserInfoWidget extends StatelessWidget {
                           child: Text(
                             '${profileController.userInfo!.fName} ${profileController.userInfo!.lName}',
                             style: rubikMedium.copyWith(
-                              color: Theme.of(context).textTheme.bodyLarge!.color,
+                              color: Colors.white,
                               fontSize: Dimensions.fontSizeLarge,
                             ),
                             textAlign: TextAlign.start,
@@ -75,7 +74,7 @@ class UserInfoWidget extends StatelessWidget {
                           child: Text(
                             '${profileController.userInfo!.phone}',
                             style: rubikMedium.copyWith(
-                              color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(Get.isDarkMode ? 0.8 :0.5),
+                              color: Colors.white70,
                               fontSize: Dimensions.fontSizeLarge,
                             ),
                             textAlign: TextAlign.start, maxLines: 1,
@@ -100,7 +99,7 @@ class UserInfoWidget extends StatelessWidget {
                   ),
                   child: GetBuilder<ProfileController>(builder: (controller) {
                     return Container(
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).secondaryHeaderColor),
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: BqColors.accent),
                       padding: const EdgeInsets.all(10.0),
                       child: SvgPicture.string(controller.userInfo!.qrCode!, height: 24, width: 24,),
                     );

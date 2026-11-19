@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:six_cash/core/theme/buqsh_design.dart';
 import 'package:six_cash/features/pos/auth/cashier_auth_controller.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
 import 'package:six_cash/helper/route_helper.dart';
@@ -18,9 +19,9 @@ class CashierDashboardScreen extends StatefulWidget {
 class _CashierDashboardScreenState extends State<CashierDashboardScreen> {
   int _currentTabIndex = 0;
 
-  static const Color kPrimaryColor = Color(0xFF004D40);
-  static const Color kLimeColor = Color(0xFFD4E157);
-  static const Color kBgColor = Color(0xFFF8F9FA);
+  static const Color kPrimaryColor = BqColors.brand;
+  static const Color kLimeColor = BqColors.accent;
+  static const Color kBgColor = BqColors.bg;
 
   @override
   void initState() {
@@ -94,8 +95,8 @@ class _CashierDashboardScreenState extends State<CashierDashboardScreen> {
   /// 1. الهيدر الأخضر الداكن الفخم المتطابق مع هوية بقش
   Widget _buildHeader(CashierAuthController controller) {
     final info = controller.sessionInfo;
-    final cashierName = info?.cashierName ?? 'أحمد الكاشير التجريبي';
-    final cashierCode = info?.cashierCode ?? 'CSH-001';
+    final cashierName = info?.cashierName ?? '—';
+    final cashierCode = info?.cashierCode ?? '—';
 
     return Container(
       color: kPrimaryColor,
@@ -227,9 +228,9 @@ class _CashierDashboardScreenState extends State<CashierDashboardScreen> {
   /// 2. كارت بيانات جهاز نقطة البيع (Terminal Card)
   Widget _buildTerminalCard(CashierAuthController controller) {
     final info = controller.sessionInfo;
-    final terminalName = info?.terminalName ?? 'جهاز نقطة البيع #01';
-    final merchantName = info?.merchantName ?? 'بقش للمدفوعات الرقمية';
-    final branchName = info?.branchName ?? 'الفرع الرئيسي';
+    final terminalName = info?.terminalName ?? '—';
+    final merchantName = info?.merchantName ?? '—';
+    final branchName = info?.branchName ?? '—';
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -325,9 +326,9 @@ class _CashierDashboardScreenState extends State<CashierDashboardScreen> {
   /// 3. كارت الوردية الحالية (Shift Card)
   Widget _buildShiftCard(CashierAuthController controller) {
     final info = controller.sessionInfo;
-    final openingBalance = info?.shiftOpeningBalance ?? 150000.0;
-    final totalSales = info?.shiftTotalSales ?? 1769136.25;
-    final count = info?.shiftTransactionsCount ?? 28;
+    final openingBalance = info?.shiftOpeningBalance ?? 0.0;
+    final totalSales = info?.shiftTotalSales ?? 0.0;
+    final count = info?.shiftTransactionsCount ?? 0;
 
     return Container(
       padding: const EdgeInsets.all(18),
