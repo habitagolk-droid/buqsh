@@ -55,7 +55,7 @@ void showCustomSnackBarHelper(String? message, {bool isError = true, bool isIcon
         isDismissible: true,
         backgroundColor: isError ? BqColors.error : BqColors.success,
         margin: const EdgeInsets.fromLTRB(14, 0, 14, 96),
-        borderRadius: BorderRadius.circular(BqRadius.pill),
+        borderRadius: BqRadius.pill,
 
         icon: isIcon ?  IconButton(icon: const Icon(Icons.clear,size: 16,),color: Colors.white,
             onPressed: (){

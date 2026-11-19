@@ -446,7 +446,7 @@ class _TransactionBalanceInputScreenState extends State<TransactionBalanceInputS
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('بيانات الحركة', textAlign: TextAlign.right),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF278D5B), Color(0xFF0C4A40)]), borderRadius: BorderRadius.circular(16)), child: Text('${amount.toStringAsFixed(2)} ${splashController.configModel?.currencySymbol ?? ''}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800))),
+            Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF278D5B), Color(0xFF0C4A40)]), borderRadius: BorderRadius.circular(16)), child: Text('${amount.toStringAsFixed(2)} ${Get.find<SplashController>().configModel?.currencySymbol ?? ''}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800))),
             const SizedBox(height: 12),
             const Text('يرجى التحقق من المبلغ وطريقة الدفع قبل المتابعة، فالعملية لا يمكن إلغاؤها بعد التنفيذ.', textAlign: TextAlign.right, style: TextStyle(color: Color(0xFFB3261E), fontSize: 12)),
           ]),

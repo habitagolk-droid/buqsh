@@ -48,6 +48,8 @@ jobs:
       - name: Install Dart dependencies
         run: flutter pub get
 
+      # Deprecation notices are informational in newer Flutter/Dart versions.
+      # Keep analysis errors fatal, but don't fail CI on info/warning-only batches.
       - name: Analyze Dart code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
