@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:six_cash/common/widgets/custom_ink_well_widget.dart';
-import 'package:six_cash/features/transaction_money/screens/send_money_screen.dart';
-import 'package:six_cash/features/transaction_money/screens/transaction_balance_input_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_return_change_screen.dart';
 import 'package:six_cash/features/pos/screens/pos_payment_screen.dart';
 import 'package:six_cash/helper/custom_snackbar_helper.dart';
@@ -58,15 +56,13 @@ class ServicesGridWidget extends StatelessWidget {
       _ServiceItem(
         key: 'svc_local_remit',
         icon: Icons.send_outlined,
-        onTap: () => Get.to(() => const SendMoneyScreen()),
+        onTap: () => Get.toNamed(RouteHelper.sendMoney),
       ),
       // 3. svc_topup
       _ServiceItem(
         key: 'svc_topup',
         icon: Icons.add_circle_outline,
-        onTap: () => Get.to(
-          const TransactionBalanceInputScreen(transactionType: 'add_money'),
-        ),
+        onTap: () => Get.toNamed(RouteHelper.addMoney),
       ),
       // 4. svc_withdraw
       _ServiceItem(

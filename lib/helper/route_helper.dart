@@ -26,6 +26,7 @@ import 'package:six_cash/features/setting/screens/qr_code_download_or_share_scre
 import 'package:six_cash/features/setting/screens/support_screen.dart';
 import 'package:six_cash/features/splash/screens/splash_screen.dart';
 import 'package:six_cash/features/transaction_money/screens/send_money_screen.dart';
+import 'package:six_cash/features/transaction_money/screens/transaction_money_screen.dart';
 import 'package:six_cash/features/transaction_money/screens/transaction_balance_input_screen.dart';
 import 'package:six_cash/features/transaction_money/screens/transaction_confirmation_screen.dart';
 import 'package:six_cash/features/transaction_money/widgets/share_statement_widget.dart';
@@ -40,6 +41,7 @@ import 'package:six_cash/features/pos/screens/cashier_login_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_home_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_wallets_screen.dart';
 import 'package:six_cash/features/pos/screens/cashier_pos_sale_screen.dart';
+import 'package:six_cash/helper/transaction_type.dart';
 
 class RouteHelper {
   static const String splash = '/splash';
@@ -170,6 +172,7 @@ class RouteHelper {
   static getEditProfileRoute() => editProfileScreen;
   static getChangePinRoute() => changePinScreen;
   static getAddMoneyInputRoute() => addMoneyInput;
+  static getAddMoneyRoute() => addMoney;
   // static  getFVerificationRoute({required String phoneNumber}) => '$fVerificationScreen?phone-number=$phoneNumber';
 
   static getSupportRoute() => support;
@@ -237,9 +240,57 @@ class RouteHelper {
       page: () => SendMoneyScreen(initialPhone: Get.parameters['phone-number']),
     ),
     GetPage(
+      name: requestMoney,
+      page: () => TransactionMoneyScreen(
+        fromEdit: Get.parameters['from-edit'] == 'edit-number',
+        phoneNumber: Get.parameters['phone-number'],
+        transactionType: TransactionType.requestMoney,
+      ),
+    ),
+    GetPage(
+      name: cashOut,
+      page: () => TransactionMoneyScreen(
+        fromEdit: Get.parameters['from-edit'] == 'edit-number',
+        phoneNumber: Get.parameters['phone-number'],
+        transactionType: TransactionType.cashOut,
+      ),
+    ),
+    GetPage(
+      name: addMoney,
+      page: () => const TransactionBalanceInputScreen(
+        transactionType: TransactionType.addMoney,
+      ),
+    ),
+    GetPage(
       name: sendMoneyBalanceInput,
       page: () => TransactionBalanceInputScreen(
         transactionType: Get.parameters['transaction-type'],
+      ),
+    ),
+    GetPage(
+      name: requestMoneyBalanceInput,
+      page: () => const TransactionBalanceInputScreen(
+        transactionType: TransactionType.requestMoney,
+      ),
+    ),
+    GetPage(
+      name: cashOutBalanceInput,
+      page: () => const TransactionBalanceInputScreen(
+        transactionType: TransactionType.cashOut,
+      ),
+    ),
+    GetPage(
+      name: requestMoneyConfirmation,
+      page: () => TransactionConfirmationScreen(
+        inputBalance: double.tryParse(Get.parameters['input-balance'] ?? '0'),
+        transactionType: TransactionType.requestMoney,
+      ),
+    ),
+    GetPage(
+      name: cashOutConfirmation,
+      page: () => TransactionConfirmationScreen(
+        inputBalance: double.tryParse(Get.parameters['input-balance'] ?? '0'),
+        transactionType: TransactionType.cashOut,
       ),
     ),
     GetPage(
